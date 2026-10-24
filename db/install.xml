@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="admin/tool/mucohort/db" VERSION="20261024" COMMENT="XMLDB file for tool_mucohort plugin"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tool_mucohort" COMMENT="Advanced cohorts (curated and rule-based) - extends cohort records with component tool_mucohort">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="cohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Relevant cohort id where component is set to tool_mucohort"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Cohort type: curated or rules"/>
+        <FIELD NAME="candidatecohortid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Limits adding of new members only (manually, uploads or rules), never causes removals; does not apply to forced users; a deleted cohort blocks new additions"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="cohortid" TYPE="foreign-unique" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
+        <KEY NAME="candidatecohortid" TYPE="foreign" FIELDS="candidatecohortid" REFTABLE="cohort" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_access" COMMENT="Explicit per-cohort access, changed only by users with capabilities; any record allows finding and using the cohort">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="iscurator" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1 marks the one person shown as responsible for the cohort, NULL otherwise; honorary title that does not grant any permissions automatically, the curator may receive notifications"/>
+        <FIELD NAME="viewmembers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may list members and explain membership; implied by managemembers and manageexceptions"/>
+        <FIELD NAME="managemembers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may add and remove members of curated cohorts, within the limits of candidates and forced/blocked users"/>
+        <FIELD NAME="manageexceptions" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may manage forced and blocked users; all flags 0 means the user may only find and use the cohort, for example in enrolment methods"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who made the last change, NULL if unknown or deleted"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mucohortid-userid" UNIQUE="true" FIELDS="mucohortid, userid"/>
+        <INDEX NAME="mucohortid-iscurator" UNIQUE="true" FIELDS="mucohortid, iscurator" COMMENT="Only one curator per cohort, NULL values are not unique"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_exception" COMMENT="Exceptions: users that are always (forced) or never (blocked) members of the cohort, use only in exceptional cases or during cohort type migration">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="1 means forced - always member; 2 means blocked - never member, existing membership is removed"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Optional plain text reason entered by the person who added the exception, shown only to users who may manage exceptions; cleared on privacy deletion"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who made the last change, NULL if unknown or deleted"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mucohortid-userid" UNIQUE="true" FIELDS="mucohortid, userid" COMMENT="User cannot be both forced and blocked"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_role" COMMENT="Roles automatically assigned to cohort members, assignments use component tool_mucohort and itemid of this record">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="roleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Context where role is assigned to members, such as system or category, NULL means the cohort context which follows the cohort when it is moved"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who added the record, NULL if unknown or deleted"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+        <KEY NAME="roleid" TYPE="foreign" FIELDS="roleid" REFTABLE="role" REFFIELDS="id"/>
+        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
+        <KEY NAME="usercreated" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mucohortid-roleid-contextid" UNIQUE="true" FIELDS="mucohortid, roleid, contextid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_curated" COMMENT="Settings of curated cohorts, created and deleted together with conversion to and from curated type">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="maxmembers" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Limits all additions of new members, never causes removals; forced users are exempt (deliberate overbooking); NULL means no limit"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign-unique" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_rules" COMMENT="Rules and sync settings of rule-based cohorts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="broken" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means rules could not be evaluated (missing cohort or source), sync is skipped until fixed; reason is shown by re-parsing the rules"/>
+        <FIELD NAME="rulesjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Active rules, NULL means no rules were approved yet and sync is inactive; sync runs when not NULL and not broken"/>
+        <FIELD NAME="pendingrulesjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Draft rules waiting for approval via preview, NULL if there is no draft"/>
+        <FIELD NAME="synctype" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="How sync changes membership: 0 no changes, 1 add and remove members, 2 add members only (blocked users and users of other tenants are still removed); applies from the next sync"/>
+        <FIELD NAME="syncinterval" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Automatic sync interval in seconds, NULL means manual sync only"/>
+        <FIELD NAME="syncpriority" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Sync priority bucket: 0 high, 1 normal, 2 low; high cohorts sync first, then normal, then low, order within a bucket is not defined"/>
+        <FIELD NAME="synconusercreated" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means membership of user is evaluated instantly after manual creation of a single account, not in bulk operations"/>
+        <FIELD NAME="synconfirstlogin" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means membership of user is evaluated instantly on first login"/>
+        <FIELD NAME="synconlogin" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means membership of user is evaluated instantly on every login"/>
+        <FIELD NAME="timenextsync" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When the next sync is due, 0 means as soon as possible, NULL means not scheduled"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign-unique" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timenextsync" UNIQUE="false" FIELDS="timenextsync" COMMENT="Lookup of cohorts due for sync"/>
+        <INDEX NAME="synconusercreated" UNIQUE="false" FIELDS="synconusercreated" COMMENT="Fast lookup after user creation, only few cohorts have it enabled"/>
+        <INDEX NAME="synconfirstlogin" UNIQUE="false" FIELDS="synconfirstlogin" COMMENT="Fast lookup on login, only few cohorts have it enabled"/>
+        <INDEX NAME="synconlogin" UNIQUE="false" FIELDS="synconlogin" COMMENT="Fast lookup on login, only few cohorts have it enabled"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_sync" COMMENT="History of all sync runs of rule-based cohorts for tracking duration and changes over time, purged after configurable retention period">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timequeued" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="When the sync was requested, the adhoc task carries this record id"/>
+        <FIELD NAME="timestarted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="NULL while queued"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Duration in seconds, NULL while running"/>
+        <FIELD NAME="added" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of members added"/>
+        <FIELD NAME="removed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of members removed"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="0 running, 1 ok, 2 failed, 3 rejected (empty external result), 4 broken (rules cannot be evaluated), 5 cancelled, 6 queued, 7 cancel requested; row is inserted as queued, set to running at start, so crashed syncs remain visible"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Error or other details"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mucohortid-timequeued" UNIQUE="true" FIELDS="mucohortid, timequeued" COMMENT="Latest sync is unambiguous, second sync queued in the same second fails on insert"/>
+        <INDEX NAME="timequeued" UNIQUE="false" FIELDS="timequeued" COMMENT="Site report time filters and retention purge"/>
+        <INDEX NAME="duration" UNIQUE="false" FIELDS="duration" COMMENT="Site report filtering and sorting of slow syncs"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status" COMMENT="Finding the few queued and running syncs on the site"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_profilefield" COMMENT="Cache of custom profile field values of supported types for fast rule evaluation, ignores field visibility">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="charvalue" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Value of text-like fields, truncated to 255 characters"/>
+        <FIELD NAME="intvalue" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Value of checkbox and datetime fields"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="user_info_field" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid-fieldid" UNIQUE="true" FIELDS="userid, fieldid"/>
+        <INDEX NAME="fieldid-charvalue" UNIQUE="false" FIELDS="fieldid, charvalue"/>
+        <INDEX NAME="fieldid-intvalue" UNIQUE="false" FIELDS="fieldid, intvalue"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_extdb" COMMENT="External database sources of rule-based cohorts, each query may be used only once per cohort">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="queryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Admin defined external database query"/>
+        <FIELD NAME="timefirstcompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="End time of the first successful fetch, never changed afterwards; NULL means rules using this source cannot be approved and are broken"/>
+        <FIELD NAME="timefetchstarted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Start time of the last fetch attempt as max(now, previous value + 1) so it is unique; sweep is done only if unchanged at the end of fetch; NULL if never fetched"/>
+        <FIELD NAME="fetchduration" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Duration of the last fetch attempt in seconds"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="State of the last fetch attempt using the shared sync status codes, only 0 running, 1 ok, 2 failed, 3 rejected (empty external result) are used here; NULL if never fetched; does not block cohort sync because the snapshot never loses rows outside a successful sweep"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usercreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who added the source, NULL if unknown or deleted"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="mucohortid" TYPE="foreign" FIELDS="mucohortid" REFTABLE="tool_mucohort" REFFIELDS="id"/>
+        <KEY NAME="queryid" TYPE="foreign" FIELDS="queryid" REFTABLE="tool_mulib_extdb_query" REFFIELDS="id"/>
+        <KEY NAME="usercreated" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="mucohortid-queryid" UNIQUE="true" FIELDS="mucohortid, queryid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="tool_mucohort_extdb_user" COMMENT="Local snapshot of users returned by external database source">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="extdbid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="identifiertype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the external query result column the identifier came from: userid, username, useremail or useridnumber; stored per row so that identifiers may be coalesced from several columns in the future"/>
+        <FIELD NAME="useridentifier" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Raw user identifier value from external database, kept so that unmatched rows can be shown"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Matched user, resolved again on every fetch; NULL if not matched or ambiguous (matches multiple users); only users from the cohort tenant and users without tenant are matched"/>
+        <FIELD NAME="stale" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means the row was not received yet in the current fetch; all rows set to 1 at fetch start, received rows set to 0, rows still 1 deleted after a successful fetch; sweep only when tool_mucohort_extdb.timefetchstarted still matches the fetch; rules must ignore this flag"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="When the row first appeared in external database"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="extdbid" TYPE="foreign" FIELDS="extdbid" REFTABLE="tool_mucohort_extdb" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="extdbid-identifiertype-useridentifier" UNIQUE="true" FIELDS="extdbid, identifiertype, useridentifier" COMMENT="Duplicate rows from external database are collapsed"/>
+        <INDEX NAME="extdbid-userid" UNIQUE="false" FIELDS="extdbid, userid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
