@@ -112,7 +112,7 @@ final class base_test extends \advanced_testcase {
         $this->assertSame('Standard', standard::get_name());
         $this->assertSame('Curated', curated::get_name());
         $this->assertSame('Rule-based', rules::get_name());
-        $this->assertSame('Plugin: Multi-tenancy', plugin::get_component_type_name('tool_mutenancy'));
+        $this->assertSame('Plugin: Additional tools library', plugin::get_component_type_name('tool_mulib'));
         $this->assertSame('Plugin: missing (local_gone)', plugin::get_component_type_name('local_gone'));
 
         $cohort = $this->getDataGenerator()->create_cohort(['component' => 'local_gone']);

@@ -149,25 +149,32 @@ final class rules_test extends \advanced_testcase {
     public function test_rule_types(): void {
         $cohort = $this->create_cohort();
         $types = $cohort->get_rule_types();
-        $this->assertSame([
+        $include = [
             'tool_mucohort:allusers' => \tool_mucohort\local\rule\include_all_users::class,
             'tool_mucohort:suspended' => \tool_mucohort\local\rule\include_suspended::class,
             'tool_mucohort:userfield' => \tool_mucohort\local\rule\include_user_field::class,
             'tool_mucohort:cohort' => \tool_mucohort\local\rule\include_cohort::class,
             'tool_mucohort:courseenrolment' => \tool_mucohort\local\rule\include_course_enrolment::class,
             'tool_mucohort:coursecompletion' => \tool_mucohort\local\rule\include_course_completion::class,
-            'tool_mucohort:programcompletion' => \tool_mucohort\local\rule\include_program_completion::class,
-            'tool_mucohort:certification' => \tool_mucohort\local\rule\include_certification::class,
-        ], $types->get_classes(rule::KIND_INCLUDE));
-        $this->assertSame([
+        ];
+        $exclude = [
             'tool_mucohort:suspended' => \tool_mucohort\local\rule\exclude_suspended::class,
             'tool_mucohort:userfield' => \tool_mucohort\local\rule\exclude_user_field::class,
             'tool_mucohort:cohort' => \tool_mucohort\local\rule\exclude_cohort::class,
             'tool_mucohort:courseenrolment' => \tool_mucohort\local\rule\exclude_course_enrolment::class,
             'tool_mucohort:coursecompletion' => \tool_mucohort\local\rule\exclude_course_completion::class,
-            'tool_mucohort:programcompletion' => \tool_mucohort\local\rule\exclude_program_completion::class,
-            'tool_mucohort:certification' => \tool_mucohort\local\rule\exclude_certification::class,
-        ], $types->get_classes(rule::KIND_EXCLUDE));
+        ];
+        // Rules of optional MuTMS plugins.
+        if (\tool_mulib\local\mulib::is_muprog_available()) {
+            $include['tool_mucohort:programcompletion'] = \tool_mucohort\local\rule\include_program_completion::class;
+            $exclude['tool_mucohort:programcompletion'] = \tool_mucohort\local\rule\exclude_program_completion::class;
+        }
+        if (\tool_mulib\local\mulib::is_mucertify_available()) {
+            $include['tool_mucohort:certification'] = \tool_mucohort\local\rule\include_certification::class;
+            $exclude['tool_mucohort:certification'] = \tool_mucohort\local\rule\exclude_certification::class;
+        }
+        $this->assertSame($include, $types->get_classes(rule::KIND_INCLUDE));
+        $this->assertSame($exclude, $types->get_classes(rule::KIND_EXCLUDE));
         $this->assertSame(\tool_mucohort\local\rule\exclude_cohort::class, $types->get_class(rule::KIND_EXCLUDE, 'tool_mucohort:cohort'));
         $this->assertNull($types->get_class(rule::KIND_INCLUDE, 'tool_mucohort:xyz'));
         $this->assertEquals($cohort->get_cohort(), $types->get_cohort());
@@ -180,16 +187,9 @@ final class rules_test extends \advanced_testcase {
         });
         $cohort = base::fetch($cohort->get_id());
         $types = $cohort->get_rule_types();
-        $this->assertSame(
-            ['tool_mucohort:allusers', 'tool_mucohort:userfield', 'tool_mucohort:cohort', 'tool_mucohort:courseenrolment',
-                'tool_mucohort:coursecompletion', 'tool_mucohort:programcompletion', 'tool_mucohort:certification'],
-            array_keys($types->get_classes(rule::KIND_INCLUDE))
-        );
-        $this->assertSame(
-            ['tool_mucohort:userfield', 'tool_mucohort:courseenrolment', 'tool_mucohort:coursecompletion', 'tool_mucohort:programcompletion',
-                'tool_mucohort:certification'],
-            array_keys($types->get_classes(rule::KIND_EXCLUDE))
-        );
+        unset($include['tool_mucohort:suspended'], $exclude['tool_mucohort:suspended'], $exclude['tool_mucohort:cohort']);
+        $this->assertSame(array_keys($include), array_keys($types->get_classes(rule::KIND_INCLUDE)));
+        $this->assertSame(array_keys($exclude), array_keys($types->get_classes(rule::KIND_EXCLUDE)));
 
         // Unsaved cohorts are supported.
         $types = rules::create_rule_types(
