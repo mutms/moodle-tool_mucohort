@@ -231,7 +231,7 @@ final class bulk_changes {
     }
 
     /**
-     * Returns state for new parsed rows, a single column needs no column stage.
+     * Returns state for new parsed rows, a single column gets guessed defaults the user confirms in the column stage.
      *
      * @param array $rows parsed rows
      * @return array

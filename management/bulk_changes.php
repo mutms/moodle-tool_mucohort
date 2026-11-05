@@ -69,6 +69,8 @@ if (!$wizard) {
 }
 
 $state = $wizard->get_data();
+// Original input of the source stage, the form shows it again when users go back.
+$sourcedata = is_array($state['source'] ?? null) ? $state['source'] : [];
 $defaultaction = $state['defaultaction'] ?? null;
 $action = $state['action'] ?? $defaultaction;
 $exceptionactions = [bulk_changes::ACTION_FORCE, bulk_changes::ACTION_BLOCK, bulk_changes::ACTION_UNEXCEPT];
@@ -89,10 +91,10 @@ $isvalid = fn(string $stage): bool => match ($stage) {
     'options' => bulk_changes::is_options_valid($cohort, $state),
 };
 $requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = wizard::resolve_stages($labels, $isvalid, $requested);
+$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
 $stage = wizard::current_stage($stages);
 
-if ($requested === null && $isvalid('options')) {
+if ($requested === null && wizard::is_finished($stages)) {
     // Everything was answered, the dry run is repeated with current data.
     $count = bulk_changes::import($cohort, $state);
     $wizard->delete();
@@ -102,7 +104,7 @@ if ($requested === null && $isvalid('options')) {
 
 $formurl = $wizard->get_url($pageurl, $stage);
 if ($stage === 'source') {
-    $form = new bulk_changes_source($formurl, []);
+    $form = new bulk_changes_source($formurl, $sourcedata);
 } else if ($stage === 'columns') {
     $current = [];
     if (bulk_changes::is_columns_valid($state)) {
@@ -124,22 +126,24 @@ if ($form->is_cancelled()) {
     redirect($returnurl);
 }
 if ($stage !== 'source' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
-    $previous = 'source';
-    if ($stage === 'options' && count($state['rows'][0]) > 1) {
-        $previous = 'columns';
-    }
-    redirect($wizard->get_url($pageurl, $previous));
+    redirect($wizard->get_url($pageurl, $stage === 'options' ? 'columns' : 'source'));
 }
 if ($data = $form->get_data()) {
     $base = $defaultaction ? ['defaultaction' => $defaultaction] : [];
     if ($stage === 'source') {
-        $state = $base + bulk_changes::save_source($form->get_rows());
+        $state = $base + bulk_changes::save_source($form->get_rows()) + ['source' => [
+            'sourcefile' => (int)$data->sourcefile,
+            'csvtext' => $data->csvtext,
+            'encoding' => $data->encoding,
+            'delimiter_name' => $data->delimiter_name,
+        ]];
     } else if ($stage === 'columns') {
         // New columns mean a new dry run.
         $state = $base + [
             'rows' => $state['rows'],
             'headers' => !empty($data->headers),
             'column' => (int)$data->column,
+            'source' => $sourcedata,
         ];
     } else {
         $state['action'] = $data->action;
@@ -148,7 +152,7 @@ if ($data = $form->get_data()) {
         $isexception = ($data->action === bulk_changes::ACTION_FORCE || $data->action === bulk_changes::ACTION_BLOCK);
         $state['reason'] = ($isexception && $reason !== '') ? $reason : null;
     }
-    $wizard->set_data($state);
+    $wizard->complete_stage($stage, $state);
     redirect($wizard->get_url($pageurl));
 }
 

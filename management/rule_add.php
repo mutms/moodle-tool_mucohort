@@ -100,13 +100,17 @@ $labels = [
     'settings' => get_string('rule_settings', 'tool_mucohort'),
     'check' => get_string('rule_check', 'tool_mucohort'),
 ];
+if ($rule && !$rule->has_settings()) {
+    // The wizard never skips stages, stages that do not apply are left out.
+    unset($labels['settings']);
+}
 $isvalid = fn(string $stage): bool => match ($stage) {
     'type' => $rule !== null,
     'settings' => $isconfigvalid($rule, $state),
     'check' => false,
 };
 $requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = wizard::resolve_stages($labels, $isvalid, $requested);
+$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
 $stage = wizard::current_stage($stages);
 
 $formurl = $wizard->get_url($pageurl, $stage);
@@ -162,7 +166,7 @@ if ($data = $form->get_data()) {
         $wizard->delete();
         redirect($returnurl);
     }
-    $wizard->set_data($state);
+    $wizard->complete_stage($stage, $state);
     redirect($wizard->get_url($pageurl));
 }
 

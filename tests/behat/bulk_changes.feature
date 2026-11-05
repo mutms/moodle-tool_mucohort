@@ -24,9 +24,16 @@ Feature: Bulk changes of cohort members and exceptions
     And I click on "Members" "link" in the ".secondary-navigation" "css_element"
     And I click on "Cohort actions" "button"
     And I click on "Bulk changes" "link"
-    # One pasted column needs no column stage.
+    # One pasted column still goes through the column stage, the header guess is confirmed there.
     When I set the following muform fields:
       | csvtext | user1\nuser2\nUSER3\nnobody |
+    And I press "Continue"
+    Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
+    # The source stage shows the stored input again.
+    When I press "Back"
+    Then the following muform fields match:
+      | csvtext | user1\nuser2\nUSER3\nnobody |
+    When I press "Continue"
     And I press "Continue"
     Then I should see "Changes"
     And the following muform fields match:
@@ -81,6 +88,8 @@ Feature: Bulk changes of cohort members and exceptions
     And I set the following muform fields:
       | csvtext | user1\nuser3 |
     And I press "Continue"
+    Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
+    And I press "Continue"
     # User 3 is not in the candidate cohort.
     Then I should see "Ready: 1"
     And I should see "Not allowed: 1"
@@ -94,6 +103,8 @@ Feature: Bulk changes of cohort members and exceptions
     And I click on "Bulk changes" "link"
     And I set the following muform fields:
       | csvtext | user1@example.com\nuser3@example.com |
+    And I press "Continue"
+    Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
     And I press "Continue"
     Then the following muform fields match:
       | Action                  | force |
@@ -117,6 +128,8 @@ Feature: Bulk changes of cohort members and exceptions
     And I click on "Bulk changes" "link"
     And I set the following muform fields:
       | csvtext | user1 |
+    And I press "Continue"
+    Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
     And I press "Continue"
     And I set the following muform fields:
       | Action | unexcept |
