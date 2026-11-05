@@ -58,9 +58,14 @@ $PAGE->navbar->add(get_string('bulkchanges', 'tool_mucohort'));
 
 // The state belongs to this cohort, it cannot be replayed against another one.
 $wizardname = 'tool_mucohort_bulk_changes:' . $cohort->get_id();
-$wizard = wizard::load($wizardname, optional_param(wizard::PARAM, 0, PARAM_INT));
+$stages = [
+    'source' => get_string('users'),
+    'columns' => get_string('bulkchanges_columns', 'tool_mucohort'),
+    'options' => get_string('bulkchanges_changes', 'tool_mucohort'),
+];
+$wizard = wizard::load($wizardname, $stages);
 if (!$wizard) {
-    $wizard = wizard::start($wizardname);
+    $wizard = wizard::start($wizardname, $stages);
     $action = optional_param('action', '', PARAM_ALPHA);
     if (isset($actions[$action])) {
         $wizard->set_data(['defaultaction' => $action]);
@@ -80,21 +85,16 @@ if (in_array($action, $exceptionactions, true)) {
     $returnurl = new url('/admin/tool/mucohort/cohort_members.php', ['id' => $cohort->get_id()]);
 }
 
-$labels = [
-    'source' => get_string('users'),
-    'columns' => get_string('bulkchanges_columns', 'tool_mucohort'),
-    'options' => get_string('bulkchanges_changes', 'tool_mucohort'),
-];
-$isvalid = fn(string $stage): bool => match ($stage) {
-    'source' => bulk_changes::is_source_valid($state),
-    'columns' => bulk_changes::is_columns_valid($state),
-    'options' => bulk_changes::is_options_valid($cohort, $state),
+$isvalid = function (string $stage) use ($cohort, $state): bool {
+    return match ($stage) {
+        'source' => bulk_changes::is_source_valid($state),
+        'columns' => bulk_changes::is_columns_valid($state),
+        'options' => bulk_changes::is_options_valid($cohort, $state),
+    };
 };
-$requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
-$stage = wizard::current_stage($stages);
+$stage = $wizard->resolve_stages($isvalid);
 
-if ($requested === null && wizard::is_finished($stages)) {
+if ($wizard->is_finished()) {
     // Everything was answered, the dry run is repeated with current data.
     $count = bulk_changes::import($cohort, $state);
     $wizard->delete();
@@ -125,8 +125,8 @@ if ($form->is_cancelled()) {
     $wizard->delete();
     redirect($returnurl);
 }
-if ($stage !== 'source' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
-    redirect($wizard->get_url($pageurl, $stage === 'options' ? 'columns' : 'source'));
+if ($form->is_reloaded() && $wizard->get_previous_stage() !== null && $form->get_element('back')->get_value()) {
+    redirect($wizard->get_url($pageurl, $wizard->get_previous_stage()));
 }
 if ($data = $form->get_data()) {
     $base = $defaultaction ? ['defaultaction' => $defaultaction] : [];
@@ -158,5 +158,5 @@ if ($data = $form->get_data()) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('bulkchanges', 'tool_mucohort'), 2, 'mb-3');
-echo $wizard->render($OUTPUT, $stages, $pageurl, $form);
+echo $wizard->render($OUTPUT, $pageurl, $form);
 echo $OUTPUT->footer();

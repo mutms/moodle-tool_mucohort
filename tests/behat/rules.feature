@@ -143,6 +143,9 @@ Feature: Draft rules of rule-based cohorts
     And I set the following muform fields:
       | Rule type | tool_mucohort:suspended |
     And I press "Continue"
+    # Rules without settings skip the settings stage, the stepper keeps it greyed out.
+    Then ".muform-wizard-stages .muform-stepper-item.skipped" "css_element" should exist
+    And I should see "Check" in the ".muform-wizard-stages [aria-current='step']" "css_element"
     And I press "Add rule"
     And I should see "User account is suspended"
     And I press "Discard draft rules"

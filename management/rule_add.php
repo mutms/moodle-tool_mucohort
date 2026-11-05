@@ -68,9 +68,14 @@ if ($cohort->get_rules_record()->pendingrulesjson === null) {
 }
 
 $wizardname = 'tool_mucohort_rule_add:' . $cohort->get_id() . ':' . $kind;
-$wizard = wizard::load($wizardname, optional_param(wizard::PARAM, 0, PARAM_INT));
+$stages = [
+    'type' => get_string('rule_type', 'tool_mucohort'),
+    'settings' => get_string('rule_settings', 'tool_mucohort'),
+    'check' => get_string('rule_check', 'tool_mucohort'),
+];
+$wizard = wizard::load($wizardname, $stages);
 if (!$wizard) {
-    $wizard = wizard::start($wizardname);
+    $wizard = wizard::start($wizardname, $stages);
     redirect($wizard->get_url($pageurl));
 }
 
@@ -95,23 +100,16 @@ $isconfigvalid = function (?rule $rule, array $state): bool {
     return true;
 };
 
-$labels = [
-    'type' => get_string('rule_type', 'tool_mucohort'),
-    'settings' => get_string('rule_settings', 'tool_mucohort'),
-    'check' => get_string('rule_check', 'tool_mucohort'),
-];
-if ($rule && !$rule->has_settings()) {
-    // The wizard never skips stages, stages that do not apply are left out.
-    unset($labels['settings']);
-}
-$isvalid = fn(string $stage): bool => match ($stage) {
-    'type' => $rule !== null,
-    'settings' => $isconfigvalid($rule, $state),
-    'check' => false,
+$isvalid = function (string $stage) use ($rule, $state, $isconfigvalid): bool {
+    return match ($stage) {
+        'type' => $rule !== null,
+        'settings' => $isconfigvalid($rule, $state),
+        'check' => false,
+    };
 };
-$requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
-$stage = wizard::current_stage($stages);
+// Rule types without settings skip the settings stage.
+$skipped = ($rule && !$rule->has_settings()) ? ['settings'] : [];
+$stage = $wizard->resolve_stages($isvalid, $skipped);
 
 $formurl = $wizard->get_url($pageurl, $stage);
 if ($stage === 'type') {
@@ -146,9 +144,8 @@ if ($form->is_cancelled()) {
     $wizard->delete();
     redirect($returnurl);
 }
-if ($stage !== 'type' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
-    $previous = ($stage === 'check' && $rule->has_settings()) ? 'settings' : 'type';
-    redirect($wizard->get_url($pageurl, $previous));
+if ($form->is_reloaded() && $wizard->get_previous_stage() !== null && $form->get_element('back')->get_value()) {
+    redirect($wizard->get_url($pageurl, $wizard->get_previous_stage()));
 }
 if ($data = $form->get_data()) {
     if ($stage === 'type') {
@@ -172,5 +169,5 @@ if ($data = $form->get_data()) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2, 'mb-3');
-echo $wizard->render($OUTPUT, $stages, $pageurl, $form);
+echo $wizard->render($OUTPUT, $pageurl, $form);
 echo $OUTPUT->footer();
