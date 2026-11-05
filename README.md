@@ -1,4 +1,4 @@
-# Cohort management plugin for Moodle™ LMS
+# Advanced cohort management plugin for Moodle LMS
 
 Advanced cohort management for standard Moodle™ LMS installations — fully open source under GPL 3.0,
 with no restrictions on commercial use. Part of the [MuTMS suite](https://github.com/mutms).
