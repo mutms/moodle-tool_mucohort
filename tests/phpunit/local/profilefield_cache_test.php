@@ -21,23 +21,24 @@
 namespace tool_mucohort\phpunit\local;
 
 use tool_mucohort\local\profilefield_cache;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Profile field cache tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\profilefield_cache
- * @covers \tool_mucohort\local\profilefield\text
- * @covers \tool_mucohort\local\profilefield\menu
- * @covers \tool_mucohort\local\profilefield\checkbox
- * @covers \tool_mucohort\local\profilefield\datetime
- * @covers \tool_mucohort\hook\profilefield_handlers
- * @covers \tool_mucohort\task\cleanup
  */
+#[CoversClass(\tool_mucohort\local\profilefield_cache::class)]
+#[CoversClass(\tool_mucohort\local\profilefield\text::class)]
+#[CoversClass(\tool_mucohort\local\profilefield\menu::class)]
+#[CoversClass(\tool_mucohort\local\profilefield\checkbox::class)]
+#[CoversClass(\tool_mucohort\local\profilefield\datetime::class)]
+#[CoversClass(\tool_mucohort\hook\profilefield_handlers::class)]
+#[CoversClass(\tool_mucohort\task\cleanup::class)]
+#[Group('MuTMS')]
 final class profilefield_cache_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

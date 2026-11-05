@@ -28,19 +28,20 @@ use tool_mucohort\local\access;
 use tool_mucohort\local\exception;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Exception web services tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\external\set_exceptions
- * @covers \tool_mucohort\external\remove_exceptions
- * @covers \tool_mucohort\external\get_exceptions
  */
+#[CoversClass(\tool_mucohort\external\set_exceptions::class)]
+#[CoversClass(\tool_mucohort\external\remove_exceptions::class)]
+#[CoversClass(\tool_mucohort\external\get_exceptions::class)]
+#[Group('MuTMS')]
 final class exceptions_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

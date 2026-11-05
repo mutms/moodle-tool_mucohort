@@ -25,19 +25,20 @@ use tool_mucohort\local\rule\base;
 use tool_mucohort\local\rule\user_field;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * User field rule tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\rule\user_field
- * @covers \tool_mucohort\local\rule\include_user_field
- * @covers \tool_mucohort\local\rule\exclude_user_field
  */
+#[CoversClass(\tool_mucohort\local\rule\user_field::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_user_field::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_user_field::class)]
+#[Group('MuTMS')]
 final class user_field_test extends \advanced_testcase {
     /** @var rules */
     private rules $cohort;

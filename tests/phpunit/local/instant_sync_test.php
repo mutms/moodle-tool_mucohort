@@ -25,19 +25,19 @@ use tool_mucohort\local\rule\base as rule;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Instant sync of one user tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\sync::sync_user
- * @covers \tool_mucohort\local\sync::sync_user_instantly
- * @covers \tool_mucohort\local\event_observer
  */
+#[CoversClass(\tool_mucohort\local\sync::class)]
+#[CoversClass(\tool_mucohort\local\event_observer::class)]
+#[Group('MuTMS')]
 final class instant_sync_test extends \advanced_testcase {
     /**
      * Returns page renderer.

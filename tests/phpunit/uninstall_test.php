@@ -21,17 +21,18 @@
 namespace tool_mucohort\phpunit;
 
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Uninstallation tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @coversNothing
  */
+#[Group('MuTMS')]
+#[CoversNothing]
 final class uninstall_test extends \advanced_testcase {
     public function test_uninstall(): void {
         global $CFG, $DB;

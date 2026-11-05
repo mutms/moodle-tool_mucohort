@@ -24,21 +24,22 @@ use tool_mucohort\local\conversion;
 use tool_mucohort\local\role_sync;
 use tool_mucohort\local\type\curated;
 use tool_mucohort\local\type\standard;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Role sync tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\role_sync
- * @covers \tool_mucohort\task\role_sync
- * @covers \tool_mucohort\task\role_maintenance
- * @covers \tool_mucohort\event\role_added
- * @covers \tool_mucohort\event\role_removed
  */
+#[CoversClass(\tool_mucohort\local\role_sync::class)]
+#[CoversClass(\tool_mucohort\task\role_sync::class)]
+#[CoversClass(\tool_mucohort\task\role_maintenance::class)]
+#[CoversClass(\tool_mucohort\event\role_added::class)]
+#[CoversClass(\tool_mucohort\event\role_removed::class)]
+#[Group('MuTMS')]
 final class role_sync_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

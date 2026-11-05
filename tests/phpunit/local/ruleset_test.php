@@ -23,17 +23,18 @@ namespace tool_mucohort\phpunit\local;
 use tool_mucohort\local\rule\base;
 use tool_mucohort\local\broken_rules_exception;
 use tool_mucohort\local\ruleset;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Ruleset tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\ruleset
  */
+#[CoversClass(\tool_mucohort\local\ruleset::class)]
+#[Group('MuTMS')]
 final class ruleset_test extends \basic_testcase {
     public function test_empty(): void {
         $ruleset = new ruleset();

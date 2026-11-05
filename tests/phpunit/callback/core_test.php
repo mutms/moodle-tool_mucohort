@@ -21,17 +21,18 @@
 namespace tool_mucohort\phpunit\callback;
 
 use tool_mucohort\callback\core;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Core callbacks tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\callback\core
  */
+#[CoversClass(\tool_mucohort\callback\core::class)]
+#[Group('MuTMS')]
 final class core_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

@@ -25,17 +25,18 @@ use tool_mucohort\local\type\curated;
 use tool_mucohort\local\type\plugin;
 use tool_mucohort\local\type\rules;
 use tool_mucohort\local\type\standard;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Cohort type base tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\type\base
  */
+#[CoversClass(\tool_mucohort\local\type\base::class)]
+#[Group('MuTMS')]
 final class base_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

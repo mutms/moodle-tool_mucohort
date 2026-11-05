@@ -22,17 +22,18 @@ namespace tool_mucohort\phpunit\local\type;
 
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Curated cohort type tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\type\curated
  */
+#[CoversClass(\tool_mucohort\local\type\curated::class)]
+#[Group('MuTMS')]
 final class curated_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

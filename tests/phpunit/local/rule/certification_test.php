@@ -24,20 +24,21 @@ use tool_mucohort\local\broken_rules_exception;
 use tool_mucohort\local\rule\base;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Certification rule tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\rule\include_certification
- * @covers \tool_mucohort\local\rule\exclude_certification
- * @covers \tool_mucohort\muform\autocomplete\rule_certificationid
- * @covers \tool_mucohort\muform\autocompletemany\rule_certificationids
  */
+#[CoversClass(\tool_mucohort\local\rule\include_certification::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_certification::class)]
+#[CoversClass(\tool_mucohort\muform\autocomplete\rule_certificationid::class)]
+#[CoversClass(\tool_mucohort\muform\autocompletemany\rule_certificationids::class)]
+#[Group('MuTMS')]
 final class certification_test extends \advanced_testcase {
     /** @var rules */
     private rules $cohort;

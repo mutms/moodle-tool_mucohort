@@ -26,17 +26,18 @@ use tool_mucohort\local\type\curated;
 use tool_mucohort\local\type\standard;
 use tool_mucohort\local\exception;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Cohort conversion tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\conversion
  */
+#[CoversClass(\tool_mucohort\local\conversion::class)]
+#[Group('MuTMS')]
 final class conversion_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

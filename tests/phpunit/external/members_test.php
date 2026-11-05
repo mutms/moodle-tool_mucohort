@@ -28,20 +28,21 @@ use tool_mucohort\local\access;
 use tool_mucohort\local\exception;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Member web services tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\external\bulk_change_api
- * @covers \tool_mucohort\external\add_members
- * @covers \tool_mucohort\external\remove_members
- * @covers \tool_mucohort\external\get_members
  */
+#[CoversClass(\tool_mucohort\external\bulk_change_api::class)]
+#[CoversClass(\tool_mucohort\external\add_members::class)]
+#[CoversClass(\tool_mucohort\external\remove_members::class)]
+#[CoversClass(\tool_mucohort\external\get_members::class)]
+#[Group('MuTMS')]
 final class members_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

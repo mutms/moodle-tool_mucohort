@@ -24,18 +24,19 @@ use tool_mucohort\local\access;
 use tool_mucohort\local\management;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Access records tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\access
- * @covers \tool_mucohort\local\type\advanced
  */
+#[CoversClass(\tool_mucohort\local\access::class)]
+#[CoversClass(\tool_mucohort\local\type\advanced::class)]
+#[Group('MuTMS')]
 final class access_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

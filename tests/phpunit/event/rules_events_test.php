@@ -24,21 +24,22 @@ use tool_mucohort\local\rule\base as rule;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Rules and sync events tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\event\rules_draft_updated
- * @covers \tool_mucohort\event\rules_draft_discarded
- * @covers \tool_mucohort\event\rules_approved
- * @covers \tool_mucohort\event\sync_completed
- * @covers \tool_mucohort\event\sync_failed
  */
+#[CoversClass(\tool_mucohort\event\rules_draft_updated::class)]
+#[CoversClass(\tool_mucohort\event\rules_draft_discarded::class)]
+#[CoversClass(\tool_mucohort\event\rules_approved::class)]
+#[CoversClass(\tool_mucohort\event\sync_completed::class)]
+#[CoversClass(\tool_mucohort\event\sync_failed::class)]
+#[Group('MuTMS')]
 final class rules_events_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

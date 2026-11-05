@@ -21,17 +21,18 @@
 namespace tool_mucohort\phpunit\local;
 
 use tool_mucohort\local\membership_writer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Membership writer tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\membership_writer
  */
+#[CoversClass(\tool_mucohort\local\membership_writer::class)]
+#[Group('MuTMS')]
 final class membership_writer_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

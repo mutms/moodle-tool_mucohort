@@ -28,17 +28,18 @@ use tool_mucohort\local\access;
 use tool_mucohort\local\exception;
 use tool_mucohort\local\type\curated;
 use tool_mucohort\privacy\provider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Privacy provider tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\privacy\provider
  */
+#[CoversClass(\tool_mucohort\privacy\provider::class)]
+#[Group('MuTMS')]
 final class provider_test extends \core_privacy\tests\provider_testcase {
     public function setUp(): void {
         parent::setUp();

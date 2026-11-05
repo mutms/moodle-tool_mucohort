@@ -26,23 +26,24 @@ use tool_mucohort\local\rule\base;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External database rule tests.
  *
  * The test external database is the Moodle database itself.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\rule\extdb
- * @covers \tool_mucohort\local\rule\include_extdb
- * @covers \tool_mucohort\local\rule\exclude_extdb
- * @covers \tool_mucohort\local\extdb_source
- * @covers \tool_mucohort\local\extdb_query
  */
+#[CoversClass(\tool_mucohort\local\rule\extdb::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_extdb::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_extdb::class)]
+#[CoversClass(\tool_mucohort\local\extdb_source::class)]
+#[CoversClass(\tool_mucohort\local\extdb_query::class)]
+#[Group('MuTMS')]
 final class extdb_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

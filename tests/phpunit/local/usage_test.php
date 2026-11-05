@@ -23,18 +23,19 @@ namespace tool_mucohort\phpunit\local;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
 use tool_mucohort\local\usage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Cohort usage tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\usage
- * @covers \tool_mucohort\hook\cohort_usage
  */
+#[CoversClass(\tool_mucohort\local\usage::class)]
+#[CoversClass(\tool_mucohort\hook\cohort_usage::class)]
+#[Group('MuTMS')]
 final class usage_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

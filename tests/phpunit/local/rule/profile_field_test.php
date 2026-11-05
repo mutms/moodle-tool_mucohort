@@ -25,20 +25,21 @@ use tool_mucohort\local\rule\base;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Custom profile field rule tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\rule\profile_field
- * @covers \tool_mucohort\local\rule\include_profile_field
- * @covers \tool_mucohort\local\rule\exclude_profile_field
- * @covers \tool_mucohort\local\rule_not_ready_exception
  */
+#[CoversClass(\tool_mucohort\local\rule\profile_field::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_profile_field::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_profile_field::class)]
+#[CoversClass(\tool_mucohort\local\rule_not_ready_exception::class)]
+#[Group('MuTMS')]
 final class profile_field_test extends \advanced_testcase {
     /** @var rules */
     private rules $cohort;

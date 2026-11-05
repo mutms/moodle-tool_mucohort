@@ -24,20 +24,21 @@ use tool_mucohort\local\broken_rules_exception;
 use tool_mucohort\local\rule\base;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program completion rule tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\rule\include_program_completion
- * @covers \tool_mucohort\local\rule\exclude_program_completion
- * @covers \tool_mucohort\muform\autocomplete\rule_programid
- * @covers \tool_mucohort\muform\autocompletemany\rule_programids
  */
+#[CoversClass(\tool_mucohort\local\rule\include_program_completion::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_program_completion::class)]
+#[CoversClass(\tool_mucohort\muform\autocomplete\rule_programid::class)]
+#[CoversClass(\tool_mucohort\muform\autocompletemany\rule_programids::class)]
+#[Group('MuTMS')]
 final class program_test extends \advanced_testcase {
     /** @var rules */
     private rules $cohort;

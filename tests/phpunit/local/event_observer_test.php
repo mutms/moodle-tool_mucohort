@@ -26,24 +26,25 @@ use tool_mucohort\local\exception;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
 use tool_mucohort\local\type\standard;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Events and event observer tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\event_observer
- * @covers \tool_mucohort\event\access_granted
- * @covers \tool_mucohort\event\access_updated
- * @covers \tool_mucohort\event\access_revoked
- * @covers \tool_mucohort\event\exception_created
- * @covers \tool_mucohort\event\exception_updated
- * @covers \tool_mucohort\event\exception_deleted
- * @covers \tool_mucohort\event\cohort_converted
  */
+#[CoversClass(\tool_mucohort\local\event_observer::class)]
+#[CoversClass(\tool_mucohort\event\access_granted::class)]
+#[CoversClass(\tool_mucohort\event\access_updated::class)]
+#[CoversClass(\tool_mucohort\event\access_revoked::class)]
+#[CoversClass(\tool_mucohort\event\exception_created::class)]
+#[CoversClass(\tool_mucohort\event\exception_updated::class)]
+#[CoversClass(\tool_mucohort\event\exception_deleted::class)]
+#[CoversClass(\tool_mucohort\event\cohort_converted::class)]
+#[Group('MuTMS')]
 final class event_observer_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

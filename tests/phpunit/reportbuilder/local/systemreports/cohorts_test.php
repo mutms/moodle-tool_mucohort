@@ -22,17 +22,18 @@ namespace tool_mucohort\phpunit\reportbuilder\local\systemreports;
 
 use tool_mucohort\reportbuilder\local\systemreports\cohorts;
 use core_reportbuilder\system_report_factory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Cohort list report tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\reportbuilder\local\systemreports\cohorts
  */
+#[CoversClass(\tool_mucohort\reportbuilder\local\systemreports\cohorts::class)]
+#[Group('MuTMS')]
 final class cohorts_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

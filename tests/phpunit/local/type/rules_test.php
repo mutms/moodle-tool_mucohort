@@ -27,24 +27,25 @@ use tool_mucohort\local\ruleset;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\rules;
 use tool_mulib\local\sql;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Rule-based cohort type tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\type\rules
- * @covers \tool_mucohort\local\rule\include_all_users
- * @covers \tool_mucohort\local\rule\include_suspended
- * @covers \tool_mucohort\local\rule\exclude_suspended
- * @covers \tool_mucohort\local\rule\include_cohort
- * @covers \tool_mucohort\local\rule\exclude_cohort
- * @covers \tool_mucohort\local\rule\base
- * @covers \tool_mucohort\hook\rule_types
  */
+#[CoversClass(\tool_mucohort\local\type\rules::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_all_users::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_suspended::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_suspended::class)]
+#[CoversClass(\tool_mucohort\local\rule\include_cohort::class)]
+#[CoversClass(\tool_mucohort\local\rule\exclude_cohort::class)]
+#[CoversClass(\tool_mucohort\local\rule\base::class)]
+#[CoversClass(\tool_mucohort\hook\rule_types::class)]
+#[Group('MuTMS')]
 final class rules_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

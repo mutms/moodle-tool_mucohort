@@ -26,20 +26,21 @@ use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\rules;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Sync of rule-based cohorts tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\sync
- * @covers \tool_mucohort\task\sync_cohort
- * @covers \tool_mucohort\task\sync_scheduled
- * @covers \tool_mucohort\task\cleanup
  */
+#[CoversClass(\tool_mucohort\local\sync::class)]
+#[CoversClass(\tool_mucohort\task\sync_cohort::class)]
+#[CoversClass(\tool_mucohort\task\sync_scheduled::class)]
+#[CoversClass(\tool_mucohort\task\cleanup::class)]
+#[Group('MuTMS')]
 final class sync_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

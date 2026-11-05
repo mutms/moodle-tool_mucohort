@@ -24,17 +24,18 @@ use tool_mucohort\local\exception;
 use tool_mucohort\local\bulk_changes;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Bulk changes tests.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mucohort\local\bulk_changes
  */
+#[CoversClass(\tool_mucohort\local\bulk_changes::class)]
+#[Group('MuTMS')]
 final class bulk_changes_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

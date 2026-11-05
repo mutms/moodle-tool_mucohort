@@ -24,19 +24,21 @@ use tool_mucohort\local\access;
 use tool_mucohort\local\type\curated;
 use tool_mulib\local\cohort_util;
 use tool_mulib\local\search_util;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests of access records in cohort lookups of MuTMS plugins.
  *
- * @group       MuTMS
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_mulib\local\cohort_util
- * @covers \tool_mulib\local\search_util
- * @covers \tool_mulib\muform\util\autocomplete\cohort_trait
  */
+#[CoversClass(\tool_mulib\local\cohort_util::class)]
+#[CoversClass(\tool_mulib\local\search_util::class)]
+#[CoversTrait(\tool_mulib\muform\util\autocomplete\cohort_trait::class)]
+#[Group('MuTMS')]
 final class cohort_lookup_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
