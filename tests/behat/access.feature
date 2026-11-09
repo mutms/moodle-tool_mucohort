@@ -65,16 +65,14 @@ Feature: Delegated access to advanced cohorts via access records
     Then the following should exist in the "reportbuilder-table" table:
       | First name | Curator | View members |
       | Del Egate  | Yes     | Yes          |
-    And I click on "Filters" "button"
-    And I set the following fields in the "Manage members" "core_reportbuilder > Filter" to these values:
-      | Manage members operator | Yes |
-    And I click on "Apply" "button" in the "[data-region='report-filters']" "css_element"
+    And I press "+ Add filter"
+    And I click on "Manage members" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
+    And I click on "Yes" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
     And I should see "No access records found"
-    And I set the following fields in the "Manage members" "core_reportbuilder > Filter" to these values:
-      | Manage members operator | No |
-    And I click on "Apply" "button" in the "[data-region='report-filters']" "css_element"
+    And I click on "Manage members: Yes" "button"
+    And I click on "No" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
     And I should see "Del Egate" in the "reportbuilder-table" "table"
-    And I click on "Reset all" "button" in the "[data-region='report-filters']" "css_element"
+    And I click on "Remove filter: Manage members" "button"
     And I log out
 
     When I log in as "delegate"
