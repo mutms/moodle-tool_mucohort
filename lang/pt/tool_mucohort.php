@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Strings.ForbiddenStrings.Found
 
 /**
  * Strings for component 'tool_mucohort', language 'pt'.
@@ -414,7 +415,7 @@ $string['rules_synctype_1_desc'] = 'A sincronização adiciona os utilizadores q
 $string['rules_synctype_2'] = 'Apenas adicionar membros';
 $string['rules_synctype_2_desc'] = 'A sincronização adiciona os utilizadores que correspondem às regras, os membros nunca são removidos por causa das regras. Os utilizadores bloqueados e os utilizadores de outros inquilinos continuam a ser removidos.';
 $string['setting_allowsynconlogin'] = 'Permitir a sincronização imediata em cada autenticação';
-$string['setting_allowsynconlogin_desc'] = 'Permitir que os grupos globais baseados em regras atualizem a pertença do utilizador em cada autenticação. Desative esta opção se a autenticação for lenta ou falhar por causa das regras de grupos globais; também pode ser forçada no config.php com $CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0; A primeira autenticação e a criação da conta não são afetadas.';
+$string['setting_allowsynconlogin_desc'] = 'Permitir que os grupos globais baseados em regras atualizem a pertença do utilizador em cada autenticação. Desative esta opção se a autenticação for lenta ou falhar por causa das regras de grupos globais; também pode ser forçada no config.php com `$CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0;`. A primeira autenticação e a criação da conta não são afetadas.';
 $string['setting_enabledtypes'] = 'Tipos de grupo global ativados';
 $string['setting_enabledtypes_desc'] = 'Tipos de grupo global que podem ser criados, ou para os quais é possível converter, na gestão de grupos globais. Os grupos globais existentes de tipos desativados continuam a funcionar. Esta configuração aplica-se sempre à nova gestão de grupos globais, ative a substituição das páginas de grupos globais do núcleo para impedir a criação de grupos globais padrão na antiga interface do núcleo. Utilize as permissões para um controlo por papel: os grupos globais padrão precisam de moodle/cohort:manage, os grupos globais avançados precisam de tool/mucohort:manage. Os web services não são restringidos.';
 $string['setting_profilefieldlifetime'] = 'Tempo de vida da cache dos campos de perfil';
@@ -480,7 +481,7 @@ $string['type_standard'] = 'Padrão';
 $string['type_standard_desc'] = 'Grupo global clássico do Moodle, gerido com as permissões padrão, sem quaisquer funcionalidades adicionais.';
 $string['usage_audiences'] = 'Públicos-alvo de relatórios personalizados';
 $string['usage_badges'] = 'Critérios de medalhas';
-$string['usage_candidate'] = 'Grupo global de candidatos de grupos globais avançados';
+$string['usage_candidate'] = 'Grupos globais avançados: Grupo global de candidatos';
 $string['usage_cohortroles'] = 'Atribuições de papéis do grupo global';
 $string['usage_enrolcohort'] = 'Métodos de inscrição "Sincronização com Grupos globais"';
 $string['usage_enrolself'] = 'Métodos de autoinscrição restritos a membros do grupo global';

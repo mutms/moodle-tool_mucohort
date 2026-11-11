@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Strings.ForbiddenStrings.Found
 
 /**
  * Strings for component 'tool_mucohort', language 'de'.
@@ -414,7 +415,7 @@ $string['rules_synctype_1_desc'] = 'Die Synchronisierung fügt Nutzer/innen hinz
 $string['rules_synctype_2'] = 'Nur hinzufügen';
 $string['rules_synctype_2_desc'] = 'Die Synchronisierung fügt Nutzer/innen hinzu, die den Regeln entsprechen, Mitglieder werden aufgrund von Regeln nie entfernt. Blockierte Nutzer/innen und Nutzer/innen anderer Mandanten werden trotzdem entfernt.';
 $string['setting_allowsynconlogin'] = 'Sofortige Synchronisierung bei jeder Anmeldung erlauben';
-$string['setting_allowsynconlogin_desc'] = 'Erlaubt regelbasierten globalen Gruppen, die Mitgliedschaft der Person bei jeder Anmeldung zu aktualisieren. Deaktivieren Sie dies, wenn die Anmeldung wegen Regeln globaler Gruppen langsam ist oder fehlschlägt; es kann auch in config.php mit $CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0; erzwungen werden. Erste Anmeldung und Kontoerstellung sind nicht betroffen.';
+$string['setting_allowsynconlogin_desc'] = 'Erlaubt regelbasierten globalen Gruppen, die Mitgliedschaft der Person bei jeder Anmeldung zu aktualisieren. Deaktivieren Sie dies, wenn die Anmeldung wegen Regeln globaler Gruppen langsam ist oder fehlschlägt; es kann auch in config.php mit `$CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0;` erzwungen werden. Erste Anmeldung und Kontoerstellung sind nicht betroffen.';
 $string['setting_enabledtypes'] = 'Aktivierte Typen globaler Gruppen';
 $string['setting_enabledtypes_desc'] = 'Typen globaler Gruppen, die in der Verwaltung globaler Gruppen angelegt oder in die umgewandelt werden können. Bestehende globale Gruppen deaktivierter Typen funktionieren weiter. Diese Einstellung gilt immer für die neue Verwaltung globaler Gruppen. Aktivieren Sie das Ersetzen der Core-Seiten für globale Gruppen, damit niemand mehr globale Gruppen vom Typ „Standard“ in der alten Core-Oberfläche anlegen kann. Verwenden Sie Fähigkeiten zur Steuerung pro Rolle: globale Gruppen vom Typ „Standard“ erfordern moodle/cohort:manage, erweiterte globale Gruppen erfordern tool/mucohort:manage. Webservices sind nicht eingeschränkt.';
 $string['setting_profilefieldlifetime'] = 'Lebensdauer des Profilfeld-Caches';
@@ -480,7 +481,7 @@ $string['type_standard'] = 'Standard';
 $string['type_standard_desc'] = 'Klassische globale Gruppe von Moodle, verwaltet mit Standard-Fähigkeiten, ohne zusätzliche Funktionen.';
 $string['usage_audiences'] = 'Zielgruppen nutzerdefinierter Berichte';
 $string['usage_badges'] = 'Badge-Kriterien';
-$string['usage_candidate'] = 'Globale Gruppe der Kandidat/innen erweiterter globaler Gruppen';
+$string['usage_candidate'] = 'Erweiterte globale Gruppen: Globale Gruppe der Kandidat/innen';
 $string['usage_cohortroles'] = 'Rollen für globale Gruppen';
 $string['usage_enrolcohort'] = 'Einschreibemethoden „Globale Gruppe“';
 $string['usage_enrolself'] = 'Selbsteinschreibungen, die auf Mitglieder globaler Gruppen beschränkt sind';

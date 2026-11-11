@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Strings.ForbiddenStrings.Found
 
 /**
  * Strings for component 'tool_mucohort', language 'fr'.
@@ -414,7 +415,7 @@ $string['rules_synctype_1_desc'] = 'La synchronisation ajoute les utilisateurs q
 $string['rules_synctype_2'] = 'Ajouter des membres uniquement';
 $string['rules_synctype_2_desc'] = 'La synchronisation ajoute les utilisateurs qui correspondent aux règles, les membres ne sont jamais retirés à cause des règles. Les utilisateurs bloqués et les utilisateurs d’autres locataires sont tout de même retirés.';
 $string['setting_allowsynconlogin'] = 'Autoriser la synchronisation instantanée à chaque connexion';
-$string['setting_allowsynconlogin_desc'] = 'Autoriser les cohortes basées sur des règles à mettre à jour l’appartenance de l’utilisateur à chaque connexion. Désactivez ce réglage si la connexion est lente ou échoue à cause des règles de cohorte ; il peut aussi être imposé dans config.php avec $CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0; La première connexion et la création du compte ne sont pas concernées.';
+$string['setting_allowsynconlogin_desc'] = 'Autoriser les cohortes basées sur des règles à mettre à jour l’appartenance de l’utilisateur à chaque connexion. Désactivez ce réglage si la connexion est lente ou échoue à cause des règles de cohorte ; il peut aussi être imposé dans config.php avec `$CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0;`. La première connexion et la création du compte ne sont pas concernées.';
 $string['setting_enabledtypes'] = 'Types de cohorte activés';
 $string['setting_enabledtypes_desc'] = 'Types de cohorte qui peuvent être créés ou choisis lors d’une conversion dans la gestion des cohortes. Les cohortes existantes des types désactivés continuent de fonctionner. Ce réglage s’applique toujours à la nouvelle gestion des cohortes ; activez le remplacement des pages de cohortes du noyau pour empêcher la création de cohortes standards dans l’ancienne interface du noyau. Utilisez les capacités pour un contrôle par rôle : les cohortes standards nécessitent moodle/cohort:manage, les cohortes avancées nécessitent tool/mucohort:manage. Les services web ne sont pas restreints.';
 $string['setting_profilefieldlifetime'] = 'Durée de vie du cache des champs de profil';
@@ -480,7 +481,7 @@ $string['type_standard'] = 'Standard';
 $string['type_standard_desc'] = 'Cohorte Moodle classique gérée avec les capacités standards, sans aucune fonctionnalité supplémentaire.';
 $string['usage_audiences'] = 'Audiences de rapports personnalisés';
 $string['usage_badges'] = 'Critères de badges';
-$string['usage_candidate'] = 'Cohorte de candidats de cohortes avancées';
+$string['usage_candidate'] = 'Cohortes avancées : Cohorte de candidats';
 $string['usage_cohortroles'] = 'Attributions de rôles de la cohorte';
 $string['usage_enrolcohort'] = 'Méthodes d’inscription Synchronisation des cohortes';
 $string['usage_enrolself'] = 'Méthodes d’auto-inscription réservées aux membres de la cohorte';

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Strings.ForbiddenStrings.Found
 
 /**
  * Strings for component 'tool_mucohort', language 'cs'.
@@ -410,7 +411,7 @@ $string['rules_synctype_1_desc'] = 'Synchronizace přidává uživatele, kteří
 $string['rules_synctype_2'] = 'Pouze přidávat členy';
 $string['rules_synctype_2_desc'] = 'Synchronizace přidává uživatele, kteří odpovídají pravidlům, kvůli pravidlům nejsou členové nikdy odebráni. Blokovaní uživatelé a uživatelé jiných klientů jsou přesto odebráni.';
 $string['setting_allowsynconlogin'] = 'Povolit okamžitou synchronizaci při každém přihlášení';
-$string['setting_allowsynconlogin_desc'] = 'Umožní globálním skupinám založeným na pravidlech aktualizovat členství uživatele při každém přihlášení. Vypněte, pokud je přihlášení pomalé nebo selhává kvůli pravidlům globálních skupin; lze to také vynutit v config.php pomocí $CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0; První přihlášení a vytvoření účtu nejsou ovlivněny.';
+$string['setting_allowsynconlogin_desc'] = 'Umožní globálním skupinám založeným na pravidlech aktualizovat členství uživatele při každém přihlášení. Vypněte, pokud je přihlášení pomalé nebo selhává kvůli pravidlům globálních skupin; lze to také vynutit v config.php pomocí `$CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0;`. První přihlášení a vytvoření účtu nejsou ovlivněny.';
 $string['setting_enabledtypes'] = 'Povolené typy globálních skupin';
 $string['setting_enabledtypes_desc'] = 'Typy globálních skupin, které lze ve správě globálních skupin vytvořit nebo na které lze převést. Stávající globální skupiny vypnutých typů fungují dál. Toto nastavení platí vždy pro novou správu globálních skupin; abyste zabránili vytváření standardních globálních skupin ve starém rozhraní jádra, zapněte převzetí stránek globálních skupin jádra. Pro řízení podle rolí použijte pravomoci: standardní globální skupiny vyžadují moodle/cohort:manage, rozšířené globální skupiny vyžadují tool/mucohort:manage. Webové služby nejsou omezeny.';
 $string['setting_profilefieldlifetime'] = 'Životnost mezipaměti polí profilu';
@@ -476,7 +477,7 @@ $string['type_standard'] = 'Standardní';
 $string['type_standard_desc'] = 'Klasická globální skupina Moodle spravovaná standardními pravomocemi, bez dalších funkcí.';
 $string['usage_audiences'] = 'Vlastní sestavy viditelné členům globální skupiny';
 $string['usage_badges'] = 'Kritéria odznaků';
-$string['usage_candidate'] = 'Globální skupina kandidátů rozšířených globálních skupin';
+$string['usage_candidate'] = 'Rozšířené globální skupiny: Globální skupina kandidátů';
 $string['usage_cohortroles'] = 'Přiřazení rolí globální skupiny';
 $string['usage_enrolcohort'] = 'Metody zápisu synchronizací s globální skupinou';
 $string['usage_enrolself'] = 'Metody zápisu sebe sama omezené na členy globální skupiny';

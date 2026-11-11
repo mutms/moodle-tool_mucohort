@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Strings.ForbiddenStrings.Found
 
 /**
  * Cohort management plugin language strings.
@@ -410,7 +411,7 @@ $string['rules_synctype_1_desc'] = 'Sync adds users who match the rules and remo
 $string['rules_synctype_2'] = 'Add members only';
 $string['rules_synctype_2_desc'] = 'Sync adds users who match the rules, members are never removed because of rules. Blocked users and users of other tenants are still removed.';
 $string['setting_allowsynconlogin'] = 'Allow instant sync on every login';
-$string['setting_allowsynconlogin_desc'] = 'Allow rule-based cohorts to update membership of the user on every login. Disable this if login is slow or failing because of cohort rules; it can be also forced in config.php with $CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0; First login and account creation are not affected.';
+$string['setting_allowsynconlogin_desc'] = 'Allow rule-based cohorts to update membership of the user on every login. Disable this if login is slow or failing because of cohort rules; it can be also forced in config.php with `$CFG->forced_plugin_settings[\'tool_mucohort\'][\'allowsynconlogin\'] = 0;`. First login and account creation are not affected.';
 $string['setting_enabledtypes'] = 'Enabled cohort types';
 $string['setting_enabledtypes_desc'] = 'Cohort types that can be created or converted to in the cohort management. Existing cohorts of disabled types keep working. This setting always applies to the new cohort management, enable the takeover of core cohort pages to stop people from creating standard cohorts in the old core interface. Use capabilities for per-role control: standard cohorts need moodle/cohort:manage, advanced cohorts need tool/mucohort:manage. Web services are not restricted.';
 $string['setting_profilefieldlifetime'] = 'Profile field cache lifetime';
@@ -476,7 +477,7 @@ $string['type_standard'] = 'Standard';
 $string['type_standard_desc'] = 'Classic Moodle cohort managed with standard capabilities, without any extra features.';
 $string['usage_audiences'] = 'Custom report audiences';
 $string['usage_badges'] = 'Badge criteria';
-$string['usage_candidate'] = 'Candidate cohort of advanced cohorts';
+$string['usage_candidate'] = 'Advanced cohorts: Candidate cohort';
 $string['usage_cohortroles'] = 'Cohort role assignments';
 $string['usage_enrolcohort'] = 'Cohort sync enrolment methods';
 $string['usage_enrolself'] = 'Self enrolment methods restricted to cohort members';
