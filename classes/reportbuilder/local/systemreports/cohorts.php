@@ -23,7 +23,6 @@ use core_reportbuilder\system_report;
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\report\filter;
-use core_reportbuilder\local\filters\boolean_select;
 use core_reportbuilder\local\filters\select;
 use tool_mucohort\local\type;
 use tool_mucohort\local\management;
@@ -247,13 +246,13 @@ final class cohorts extends system_report {
         ))->set_options($members));
 
         if ($context->contextlevel != CONTEXT_SYSTEM || $this->has_subcategories()) {
-            $this->add_filter(new filter(
-                boolean_select::class,
+            $this->add_filter((new filter(
+                \tool_mulib\reportbuilder\local\filters\boolean_yes::class,
                 'currentcontextonly',
                 new lang_string('currentcontextonly', 'tool_mucohort'),
                 $entityname,
                 "CASE WHEN {$c}.contextid = {$context->id} THEN 1 ELSE 0 END"
-            ));
+            ))->set_limited_operators(\tool_mulib\reportbuilder\local\filters\boolean_yes::OPERATORS));
         }
 
         $this->add_filters_from_entity('cohort', ['customfield*']);
