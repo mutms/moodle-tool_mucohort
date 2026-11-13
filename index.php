@@ -89,7 +89,13 @@ $report = \core_reportbuilder\system_report_factory::create(
     \tool_mucohort\reportbuilder\local\systemreports\cohorts::class,
     $context
 );
-echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report));
+echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
+    'cohort:name' => null,
+    'cohort:currentcontextonly' => null,
+    'cohort:type' => null,
+    'cohort:members' => null,
+]));
 echo $report->output();
+echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
 
 echo $OUTPUT->footer();

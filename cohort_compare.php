@@ -126,8 +126,11 @@ if ($withids) {
         0,
         ['cohortid' => $cohort->get_id(), 'with' => $with, 'mode' => $mode]
     );
-    echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report));
+    echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
+        'user:fullname' => null,
+    ]));
     echo $report->output();
+    echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
 }
 
 echo $OUTPUT->footer();
