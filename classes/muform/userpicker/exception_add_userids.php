@@ -16,12 +16,11 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocomplete;
+namespace tool_mucohort\muform\userpicker;
 
 use tool_mucohort\local\type\advanced;
 use tool_mucohort\local\type\base;
 use tool_mulib\local\sql;
-use tool_mulib\muform\util\autocomplete\user_trait;
 
 /**
  * Users for new exceptions of an advanced cohort.
@@ -30,9 +29,7 @@ use tool_mulib\muform\util\autocomplete\user_trait;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class exception_add_userids extends \tool_mulib\muform\autocomplete\base {
-    use user_trait;
-
+final class exception_add_userids extends \tool_mulib\muform\userpicker\base {
     /** @var advanced */
     private advanced $cohort;
 
@@ -63,27 +60,17 @@ final class exception_add_userids extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        return $this->search_users($this->cohort->get_context(), $query, $maxitems, $exclude, $this->get_where());
+    protected function get_context(): \core\context {
+        return $this->cohort->get_context();
     }
-
-    #[\Override]
-    public function labels(array $values): array {
-        return $this->user_labels($this->cohort->get_context(), $values, $this->get_where());
-    }
-
-    #[\Override]
-    public function validate(array $values): array {
-        return $this->validate_users($values);
-    }
-
 
     /**
      * Users with exceptions are not candidates.
      *
-     * @return sql
+     * @return sql|null
      */
-    private function get_where(): sql {
+    #[\Override]
+    protected function get_candidates_sql(): ?sql {
         return new sql(
             "NOT EXISTS (SELECT 'x' FROM {tool_mucohort_exception} e WHERE e.userid = u.id AND e.mucohortid = :emucohortid)",
             ['emucohortid' => $this->cohort->get_mucohort()->id]

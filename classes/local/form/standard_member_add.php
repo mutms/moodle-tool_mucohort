@@ -18,12 +18,12 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\userpickermany;
 use tool_mulib\muform\form;
-use tool_mucohort\muform\autocomplete\standard_member_add_userids;
+use tool_mucohort\muform\userpicker\standard_member_add_userids;
 
 /**
  * Add standard cohort members.
@@ -37,7 +37,7 @@ final class standard_member_add extends form {
     protected function definition(): void {
         $cohortid = (int)$this->get_current_data()['cohortid'];
 
-        $userids = new autocompletemany('userids', get_string('users'), new standard_member_add_userids($cohortid));
+        $userids = new userpickermany('userids', get_string('users'), new standard_member_add_userids($cohortid));
         $userids->set_required(true);
         $this->add($userids);
 

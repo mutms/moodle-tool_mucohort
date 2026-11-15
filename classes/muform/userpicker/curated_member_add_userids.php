@@ -16,11 +16,11 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocomplete;
+namespace tool_mucohort\muform\userpicker;
 
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
-use tool_mulib\muform\util\autocomplete\user_trait;
+use tool_mulib\local\sql;
 
 /**
  * New members of a curated cohort - candidate cohort, blocked users and tenants are respected.
@@ -29,9 +29,7 @@ use tool_mulib\muform\util\autocomplete\user_trait;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class curated_member_add_userids extends \tool_mulib\muform\autocomplete\base {
-    use user_trait;
-
+final class curated_member_add_userids extends \tool_mulib\muform\userpicker\base {
     /** @var curated */
     private curated $cohort;
 
@@ -62,18 +60,12 @@ final class curated_member_add_userids extends \tool_mulib\muform\autocomplete\b
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        $where = $this->cohort->get_new_member_sql();
-        return $this->search_users($this->cohort->get_context(), $query, $maxitems, $exclude, $where);
+    protected function get_context(): \core\context {
+        return $this->cohort->get_context();
     }
 
     #[\Override]
-    public function labels(array $values): array {
-        return $this->user_labels($this->cohort->get_context(), $values, $this->cohort->get_new_member_sql());
-    }
-
-    #[\Override]
-    public function validate(array $values): array {
-        return $this->validate_users($values);
+    protected function get_candidates_sql(): ?sql {
+        return $this->cohort->get_new_member_sql();
     }
 }

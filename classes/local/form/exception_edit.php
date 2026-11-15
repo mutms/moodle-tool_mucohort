@@ -18,16 +18,16 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\radiocards;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\textarea;
+use tool_mulib\muform\element\userpickermany;
 use tool_mulib\muform\form;
 use tool_mucohort\local\exception;
-use tool_mucohort\muform\autocomplete\exception_add_userids;
+use tool_mucohort\muform\userpicker\exception_add_userids;
 
 /**
  * Add or update exceptions.
@@ -43,7 +43,7 @@ final class exception_edit extends form {
 
         if (empty($current['id'])) {
             $source = new exception_add_userids((int)$current['cohortid']);
-            $userids = new autocompletemany('userids', get_string('users'), $source);
+            $userids = new userpickermany('userids', get_string('users'), $source);
             $userids->set_required(true);
             $this->add($userids);
         } else {

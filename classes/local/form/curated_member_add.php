@@ -18,15 +18,15 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\userpickermany;
 use tool_mulib\muform\form;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
-use tool_mucohort\muform\autocomplete\curated_member_add_userids;
+use tool_mucohort\muform\userpicker\curated_member_add_userids;
 
 /**
  * Add curated cohort members.
@@ -56,7 +56,7 @@ final class curated_member_add extends form {
             $this->add(new info('candidate', get_string('candidatecohort', 'tool_mucohort'), $text, info::HTML));
         }
 
-        $userids = new autocompletemany('userids', get_string('users'), new curated_member_add_userids($cohortid));
+        $userids = new userpickermany('userids', get_string('users'), new curated_member_add_userids($cohortid));
         $userids->set_required(true);
         $this->add($userids);
 

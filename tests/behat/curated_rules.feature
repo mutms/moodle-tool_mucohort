@@ -48,9 +48,9 @@ Feature: Candidate cohort, blocked and forced users are respected in curated coh
     And "Remove member" "link" should not exist in the "User 3" "table_row"
     When I press "Add members"
     And I type "User 5" into the "userids" muform search field
-    Then I should see "No results" in the "dialog[open]" "css_element"
+    Then I should see "No results" in the "dialog.tool_mulib-picker-panel" "css_element"
     And I type "User 2" into the "userids" muform search field
-    And I should see "No results" in the "dialog[open]" "css_element"
+    And I should see "No results" in the "dialog.tool_mulib-picker-panel" "css_element"
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | User 4 |
     And I click on "Add members" "button" in the "dialog[open]" "css_element"

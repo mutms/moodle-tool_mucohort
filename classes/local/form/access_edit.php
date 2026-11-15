@@ -18,16 +18,16 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocomplete;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
 use tool_mulib\muform\element\checkboxcards;
 use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\userpicker;
 use tool_mulib\muform\form;
 use tool_mucohort\local\type\advanced;
-use tool_mucohort\muform\autocomplete\access_add_userid;
+use tool_mucohort\muform\userpicker\access_add_userid;
 
 /**
  * Add or update access record.
@@ -44,7 +44,7 @@ final class access_edit extends form {
         $current = $this->get_current_data();
 
         if (empty($current['id'])) {
-            $userid = new autocomplete('userid', get_string('user'), new access_add_userid($cohort->get_id()));
+            $userid = new userpicker('userid', get_string('user'), new access_add_userid($cohort->get_id()));
             $userid->set_required(true);
             $this->add($userid);
         } else {

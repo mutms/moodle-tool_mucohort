@@ -43,7 +43,7 @@ Feature: Member managers of curated cohorts
     And I press "Add members"
     Then I should see "Members that can still be added: 1" in the "dialog[open]" "css_element"
     And I type "User 3" into the "userids" muform search field
-    And I should see "No results" in the "dialog[open]" "css_element"
+    And I should see "No results" in the "dialog.tool_mulib-picker-panel" "css_element"
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | User 1, User 2 |
     And I click on "Add members" "button" in the "dialog[open]" "css_element"
