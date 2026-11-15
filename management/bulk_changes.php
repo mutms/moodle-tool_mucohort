@@ -15,148 +15,22 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 
 /**
  * Bulk changes of members or exceptions, one change is applied to a pasted or uploaded list of users.
  *
- * The page walks through three stages: source, identifier column, options with a dry run.
- * The parsed rows and the answers live in the muform wizard state between stages.
+ * The wizard is \tool_mucohort\local\wizard\bulk_changes\wizard.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use tool_mucohort\local\form\bulk_changes_columns;
-use tool_mucohort\local\form\bulk_changes_options;
-use tool_mucohort\local\form\bulk_changes_source;
-use tool_mucohort\local\management;
-use tool_mucohort\local\bulk_changes;
-use tool_mucohort\local\type\base;
-use tool_mulib\muform\wizard;
-use core\url;
-
-/** @var core_renderer $OUTPUT */
-/** @var moodle_page $PAGE */
-
 require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
+$action = optional_param('action', '', PARAM_ALPHA);
 
 require_login();
 
-$cohort = base::fetch($id);
-$actions = bulk_changes::get_actions($cohort);
-if (!$actions) {
-    throw new required_capability_exception($cohort->get_context(), 'moodle/cohort:assign', 'nopermissions', '');
-}
-
-$pageurl = new url('/admin/tool/mucohort/management/bulk_changes.php', ['id' => $cohort->get_id()]);
-management::setup_cohort_page($pageurl, $cohort, 'cohort_members');
-$PAGE->navbar->add(get_string('bulkchanges', 'tool_mucohort'));
-
-// The state belongs to this cohort, it cannot be replayed against another one.
-$wizardname = 'tool_mucohort_bulk_changes:' . $cohort->get_id();
-$stages = [
-    'source' => get_string('users'),
-    'columns' => get_string('bulkchanges_columns', 'tool_mucohort'),
-    'options' => get_string('bulkchanges_changes', 'tool_mucohort'),
-];
-$wizard = wizard::load($wizardname, $stages);
-if (!$wizard) {
-    $wizard = wizard::start($wizardname, $stages);
-    $action = optional_param('action', '', PARAM_ALPHA);
-    if (isset($actions[$action])) {
-        $wizard->set_data(['defaultaction' => $action]);
-    }
-    redirect($wizard->get_url($pageurl));
-}
-
-$state = $wizard->get_data();
-// Original input of the source stage, the form shows it again when users go back.
-$sourcedata = is_array($state['source'] ?? null) ? $state['source'] : [];
-$defaultaction = $state['defaultaction'] ?? null;
-$action = $state['action'] ?? $defaultaction;
-$exceptionactions = [bulk_changes::ACTION_FORCE, bulk_changes::ACTION_BLOCK, bulk_changes::ACTION_UNEXCEPT];
-if (in_array($action, $exceptionactions, true)) {
-    $returnurl = new url('/admin/tool/mucohort/cohort_exceptions.php', ['id' => $cohort->get_id()]);
-} else {
-    $returnurl = new url('/admin/tool/mucohort/cohort_members.php', ['id' => $cohort->get_id()]);
-}
-
-$isvalid = function (string $stage) use ($cohort, $state): bool {
-    return match ($stage) {
-        'source' => bulk_changes::is_source_valid($state),
-        'columns' => bulk_changes::is_columns_valid($state),
-        'options' => bulk_changes::is_options_valid($cohort, $state),
-    };
-};
-$stage = $wizard->resolve_stages($isvalid);
-
-if ($wizard->is_finished()) {
-    // Everything was answered, the dry run is repeated with current data.
-    $count = bulk_changes::import($cohort, $state);
-    $wizard->delete();
-    \core\notification::success(get_string('bulkchanges_done', 'tool_mucohort', $count));
-    redirect($returnurl);
-}
-
-$formurl = $wizard->get_url($pageurl, $stage);
-if ($stage === 'source') {
-    $form = new bulk_changes_source($formurl, $sourcedata);
-} else if ($stage === 'columns') {
-    $current = [];
-    if (bulk_changes::is_columns_valid($state)) {
-        $current = ['headers' => (int)$state['headers'], 'column' => $state['column']];
-    }
-    $form = new bulk_changes_columns($formurl, $current, ['rows' => $state['rows']]);
-} else {
-    // Options of an earlier confirmation are only defaults of the form.
-    $current = array_filter([
-        'action' => $action,
-        'identifiertype' => $state['identifiertype'] ?? null,
-        'reason' => $state['reason'] ?? null,
-    ], fn($value) => $value !== null);
-    $form = new bulk_changes_options($formurl, $current, ['cohort' => $cohort, 'state' => $state]);
-}
-
-if ($form->is_cancelled()) {
-    $wizard->delete();
-    redirect($returnurl);
-}
-if ($form->is_reloaded() && $wizard->get_previous_stage() !== null && $form->get_element('back')->get_value()) {
-    redirect($wizard->get_url($pageurl, $wizard->get_previous_stage()));
-}
-if ($data = $form->get_data()) {
-    $base = $defaultaction ? ['defaultaction' => $defaultaction] : [];
-    if ($stage === 'source') {
-        $state = $base + bulk_changes::save_source($form->get_rows()) + ['source' => [
-            'sourcefile' => (int)$data->sourcefile,
-            'csvtext' => $data->csvtext,
-            'encoding' => $data->encoding,
-            'delimiter_name' => $data->delimiter_name,
-        ]];
-    } else if ($stage === 'columns') {
-        // New columns mean a new dry run.
-        $state = $base + [
-            'rows' => $state['rows'],
-            'headers' => !empty($data->headers),
-            'column' => (int)$data->column,
-            'source' => $sourcedata,
-        ];
-    } else {
-        $state['action'] = $data->action;
-        $state['identifiertype'] = $data->identifiertype;
-        $reason = trim((string)($data->reason ?? ''));
-        $isexception = ($data->action === bulk_changes::ACTION_FORCE || $data->action === bulk_changes::ACTION_BLOCK);
-        $state['reason'] = ($isexception && $reason !== '') ? $reason : null;
-    }
-    $wizard->complete_stage($stage, $state);
-    redirect($wizard->get_url($pageurl));
-}
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('bulkchanges', 'tool_mucohort'), 2, 'mb-3');
-echo $wizard->render($OUTPUT, $pageurl, $form);
-echo $OUTPUT->footer();
+(new \tool_mucohort\local\wizard\bulk_changes\wizard($id, $action))->execute();

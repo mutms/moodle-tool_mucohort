@@ -16,39 +16,32 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\local\form;
+namespace tool_mucohort\local\wizard\rule_add;
 
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
-use tool_mulib\muform\element\info;
-use tool_mulib\muform\element\inforawhtml;
-use tool_mulib\muform\element\reload;
-use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\radiocards;
+use tool_mulib\muform\element\wizardcontinue;
 use tool_mulib\muform\form;
 
 /**
- * Check the new rule before adding it, the last stage of the add rule wizard.
- *
- * Extra data:
- *  - description: rule description html
- *  - count: number of users matched by the rule
+ * Select rule type, the first stage of the add rule wizard.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class rule_check extends form {
+final class type extends form {
     #[\Override]
     protected function definition(): void {
         $extra = $this->get_extra_data();
 
-        $this->add(new inforawhtml('description', get_string('rule', 'tool_mucohort'), $extra['description']));
-        $this->add(new info('count', get_string('rule_matchcount', 'tool_mucohort'), (string)$extra['count']));
-        $this->add(new info('draftinfo', '', get_string('rule_draftinfo', 'tool_mucohort')));
+        $type = new radiocards('type', get_string('rule_type', 'tool_mucohort'), $extra['types'], $extra['descriptions']);
+        $type->set_required(true);
+        $this->add($type);
 
         $this->add(new buttons('buttons'));
-        $this->add(new submit('submit', get_string('rule_add', 'tool_mucohort')), 'buttons');
-        $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
+        $this->add(new wizardcontinue(), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 }

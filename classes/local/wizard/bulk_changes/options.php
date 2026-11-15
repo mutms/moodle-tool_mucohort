@@ -16,8 +16,9 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\local\form;
+namespace tool_mucohort\local\wizard\bulk_changes;
 
+use stdClass;
 use tool_mucohort\local\bulk_changes;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
@@ -27,8 +28,8 @@ use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\textarea;
+use tool_mulib\muform\element\wizardback;
 use tool_mulib\muform\form;
-use stdClass;
 
 /**
  * Bulk changes, stage three: what to do with the users and the dry run result.
@@ -37,7 +38,7 @@ use stdClass;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class bulk_changes_options extends form {
+final class options extends form {
     #[\Override]
     protected function definition(): void {
         /** @var \tool_mucohort\local\type\base $cohort */
@@ -80,7 +81,7 @@ final class bulk_changes_options extends form {
             $this->add(new submit('submit', $submit), 'buttons');
         }
         $this->add(new reload('refresh', get_string('bulkchanges_refresh', 'tool_mucohort')), 'buttons');
-        $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
+        $this->add(new wizardback(validate: false), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 

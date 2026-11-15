@@ -16,32 +16,40 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\local\form;
+namespace tool_mucohort\local\wizard\rule_add;
 
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
-use tool_mulib\muform\element\radiocards;
-use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\wizardback;
+use tool_mulib\muform\element\wizardcontinue;
 use tool_mulib\muform\form;
 
 /**
- * Select rule type, the first stage of the add rule wizard.
+ * Rule settings, the second stage of the add rule wizard, elements are added by the rule type.
+ *
+ * Extra data:
+ *  - rule: \tool_mucohort\local\rule\base instance
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class rule_type_select extends form {
+final class settings extends form {
     #[\Override]
     protected function definition(): void {
-        $extra = $this->get_extra_data();
+        /** @var \tool_mucohort\local\rule\base $rule */
+        $rule = $this->get_extra_data()['rule'];
 
-        $type = new radiocards('type', get_string('rule_type', 'tool_mucohort'), $extra['types'], $extra['descriptions']);
-        $type->set_required(true);
-        $this->add($type);
+        $rule->add_form_elements($this);
 
         $this->add(new buttons('buttons'));
-        $this->add(new submit('submit', get_string('continue')), 'buttons');
+        $this->add(new wizardcontinue(), 'buttons');
+        $this->add(new wizardback(), 'buttons');
         $this->add(new cancel(), 'buttons');
+    }
+
+    #[\Override]
+    protected function validation(array $data, array &$allerrors): void {
+        $this->get_extra_data()['rule']->validate_form_data($data, $allerrors);
     }
 }

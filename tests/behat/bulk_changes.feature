@@ -29,11 +29,13 @@ Feature: Bulk changes of cohort members and exceptions
       | csvtext | user1\nuser2\nUSER3\nnobody |
     And I press "Continue"
     Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
-    # The source stage shows the stored input again.
+    # The source stage shows the read data, they cannot be changed any more.
     When I press "Back"
-    Then the following muform fields match:
-      | csvtext | user1\nuser2\nUSER3\nnobody |
+    Then I should see "4 rows were read. Cancel the wizard to use different data."
+    And I should see "USER3" in the "[data-muform-name='datapreview']" "css_element"
+    And "textarea[name='csvtext']" "css_element" should not exist
     When I press "Continue"
+    Then I should see "Columns" in the ".muform-wizard-stages [aria-current='step']" "css_element"
     And I press "Continue"
     Then I should see "Changes"
     And the following muform fields match:

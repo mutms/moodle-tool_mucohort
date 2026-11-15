@@ -22,19 +22,17 @@ use core\param;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\hidden;
-use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
 
 /**
- * Rule settings, used in the add rule wizard and for editing of existing rules.
+ * Rule settings of an existing rule, the add rule wizard has its own settings stage.
  *
  * The form is storage agnostic, elements are added by the rule type.
  *
  * Extra data:
  *  - rule: \tool_mucohort\local\rule\base instance
- *  - wizard: true when used as a wizard stage
- *  - currenthash: hash of the edited rule as it is stored now, null when adding
+ *  - currenthash: hash of the edited rule as it is stored now
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
@@ -47,26 +45,19 @@ final class rule_edit extends form {
         /** @var \tool_mucohort\local\rule\base $rule */
         $rule = $extra['rule'];
 
-        if (empty($extra['wizard'])) {
-            $this->add(new hidden('hash', param::ALPHANUM));
-        }
+        $this->add(new hidden('hash', param::ALPHANUM));
 
         $rule->add_form_elements($this);
 
         $this->add(new buttons('buttons'));
-        if (empty($extra['wizard'])) {
-            $this->add(new submit('submit', get_string('rule_update', 'tool_mucohort')), 'buttons');
-        } else {
-            $this->add(new submit('submit', get_string('continue')), 'buttons');
-            $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
-        }
+        $this->add(new submit('submit', get_string('rule_update', 'tool_mucohort')), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
     protected function validation(array $data, array &$allerrors): void {
         $extra = $this->get_extra_data();
-        if (empty($extra['wizard']) && ($data['hash'] ?? null) !== $extra['currenthash']) {
+        if (($data['hash'] ?? null) !== $extra['currenthash']) {
             $allerrors['hash'][] = get_string('error_rule_changed', 'tool_mucohort');
             return;
         }

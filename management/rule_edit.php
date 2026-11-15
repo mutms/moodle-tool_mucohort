@@ -67,7 +67,7 @@ $currenthash = ruleset::get_rule_hash($current);
 $rule = $cohort->get_rule_instance($current);
 
 $data = $rule->get_form_data($current['config']) + ['hash' => $currenthash];
-$form = new rule_edit($currenturl, $data, ['rule' => $rule, 'wizard' => false, 'currenthash' => $currenthash]);
+$form = new rule_edit($currenturl, $data, ['rule' => $rule, 'currenthash' => $currenthash]);
 
 if ($form->is_cancelled()) {
     $handler->cancelled($returnurl);
