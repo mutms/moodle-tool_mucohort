@@ -55,7 +55,6 @@ final class exception_edit extends form {
             exception::TYPE_BLOCKED => get_string('exception_blocked_desc', 'tool_mucohort'),
         ];
         $type = new radiocards('type', get_string('exception_type', 'tool_mucohort'), exception::get_types(), $descriptions);
-        $type->set_required(true);
         $this->add($type);
 
         $this->add(new textarea('reason', get_string('exception_reason', 'tool_mucohort'), ['rows' => 3]));

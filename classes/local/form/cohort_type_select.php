@@ -37,7 +37,6 @@ final class cohort_type_select extends form {
         $extra = $this->get_extra_data();
 
         $type = new radiocards('type', get_string('type', 'tool_mucohort'), $extra['types'], $extra['descriptions']);
-        $type->set_required(true);
         $this->add($type);
 
         $this->add(new buttons('buttons'));

@@ -43,7 +43,6 @@ trait rules_trait {
             rules::get_synctype_descriptions()
         );
         $synctype->set_default(rules::SYNCTYPE_FULL);
-        $synctype->set_required(true);
         $this->add($synctype);
 
         $interval = new duration('syncinterval', get_string('rules_syncinterval', 'tool_mucohort'), ['w', 'd', 'h']);

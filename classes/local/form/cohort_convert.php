@@ -41,7 +41,6 @@ final class cohort_convert extends form {
         $this->add(new info('fromtype', get_string('convert_from', 'tool_mucohort')));
         $extra = $this->get_extra_data();
         $type = new radiocards('type', get_string('convert_to', 'tool_mucohort'), $extra['types'], $extra['descriptions']);
-        $type->set_required(true);
         $this->add($type);
 
         if (isset($extra['types'][rules::TYPE])) {

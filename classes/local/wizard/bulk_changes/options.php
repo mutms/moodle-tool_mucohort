@@ -49,7 +49,6 @@ final class options extends form {
         $descriptions = array_intersect_key(bulk_changes::get_action_descriptions($cohort), $actions);
         $action = (new radiocards('action', get_string('bulkchanges_action', 'tool_mucohort'), $actions, $descriptions))
             ->set_default(array_key_first($actions));
-        $action->set_required(true);
         $this->add($action);
 
         $types = bulk_changes::get_identifier_types($cohort);
