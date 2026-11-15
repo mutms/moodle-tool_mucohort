@@ -74,7 +74,7 @@ final class include_cohort extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['cohortids'] ?? [];
-        $source = new \tool_mucohort\muform\autocompletemany\rule_cohortids(
+        $source = new \tool_mucohort\muform\autocomplete\rule_cohortids(
             (int)$this->cohort->contextid,
             (int)$this->cohort->id,
             array_map('intval', $current)

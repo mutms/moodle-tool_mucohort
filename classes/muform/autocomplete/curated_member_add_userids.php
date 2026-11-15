@@ -16,24 +16,24 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocompletemany;
+namespace tool_mucohort\muform\autocomplete;
 
 use tool_mucohort\local\type\base;
-use tool_mulib\local\sql;
+use tool_mucohort\local\type\curated;
 use tool_mulib\muform\util\autocomplete\user_trait;
 
 /**
- * New members of a standard cohort.
+ * New members of a curated cohort - candidate cohort, blocked users and tenants are respected.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class standard_member_add_userids extends \tool_mulib\muform\autocompletemany\base {
+final class curated_member_add_userids extends \tool_mulib\muform\autocomplete\base {
     use user_trait;
 
-    /** @var \core\context cohort context */
-    private \core\context $context;
+    /** @var curated */
+    private curated $cohort;
 
     /**
      * Constructor.
@@ -45,10 +45,15 @@ final class standard_member_add_userids extends \tool_mulib\muform\autocompletem
         private readonly int $cohortid
     ) {
         $cohort = base::fetch($cohortid);
-        $this->context = $cohort->get_context();
-        if (!($cohort instanceof \tool_mucohort\local\type\standard) || !$cohort->can_manage_members()) {
-            throw new \core\exception\required_capability_exception($this->context, 'moodle/cohort:assign', 'nopermissions', '');
+        if (!($cohort instanceof curated) || !$cohort->can_manage_members()) {
+            throw new \core\exception\required_capability_exception(
+                $cohort->get_context(),
+                'tool/mucohort:managemembers',
+                'nopermissions',
+                ''
+            );
         }
+        $this->cohort = $cohort;
     }
 
     #[\Override]
@@ -58,29 +63,17 @@ final class standard_member_add_userids extends \tool_mulib\muform\autocompletem
 
     #[\Override]
     public function search(string $query, int $maxitems, array $exclude): ?array {
-        return $this->search_users($this->context, $query, $maxitems, $exclude, $this->get_where());
+        $where = $this->cohort->get_new_member_sql();
+        return $this->search_users($this->cohort->get_context(), $query, $maxitems, $exclude, $where);
     }
 
     #[\Override]
     public function labels(array $values): array {
-        return $this->user_labels($this->context, $values, $this->get_where());
+        return $this->user_labels($this->cohort->get_context(), $values, $this->cohort->get_new_member_sql());
     }
 
     #[\Override]
     public function validate(array $values): array {
         return $this->validate_users($values);
-    }
-
-
-    /**
-     * Existing members are not candidates.
-     *
-     * @return sql
-     */
-    private function get_where(): sql {
-        return new sql(
-            "NOT EXISTS (SELECT 'x' FROM {cohort_members} cm WHERE cm.userid = u.id AND cm.cohortid = :mcohortid)",
-            ['mcohortid' => $this->cohortid]
-        );
     }
 }

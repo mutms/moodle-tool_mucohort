@@ -61,13 +61,13 @@ final class rule_cohortid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         $exclude = $this->cohortid ? [(string)$this->cohortid] : [];
         return $this->search_cohorts($this->context, $query, $maxitems, $exclude);
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         if ($this->cohortid && $value === (string)$this->cohortid) {
             return null;
         }

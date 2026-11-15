@@ -26,7 +26,7 @@ use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
 use tool_mucohort\local\type\base;
 use tool_mucohort\local\type\curated;
-use tool_mucohort\muform\autocompletemany\curated_member_add_userids;
+use tool_mucohort\muform\autocomplete\curated_member_add_userids;
 
 /**
  * Add curated cohort members.

@@ -66,7 +66,7 @@ final class rule_queryid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         global $DB, $USER;
 
         [$insql, $inparams] = $DB->get_in_or_equal($this->context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'qctx');
@@ -108,7 +108,7 @@ final class rule_queryid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         global $DB;
 
         if (!preg_match('/^[1-9][0-9]*$/D', $value)) {

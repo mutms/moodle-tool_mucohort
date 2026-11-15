@@ -83,7 +83,7 @@ final class include_certification extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['certificationids'] ?? [];
-        $source = new \tool_mucohort\muform\autocompletemany\rule_certificationids(
+        $source = new \tool_mucohort\muform\autocomplete\rule_certificationids(
             (int)$this->cohort->contextid,
             array_map('intval', $current)
         );

@@ -261,13 +261,13 @@ final class curated_test extends \advanced_testcase {
         $cohort = curated::create((object)['contextid' => \core\context\system::instance()->id, 'name' => 'Curated']);
         $user = $this->getDataGenerator()->create_user(['suspended' => 1]);
 
-        $source = new \tool_mucohort\muform\autocompletemany\curated_member_add_userids($cohort->get_id());
+        $source = new \tool_mucohort\muform\autocomplete\curated_member_add_userids($cohort->get_id());
         $this->assertSame([], $source->validate([(string)$user->id]));
         $this->assertArrayHasKey((string)$user->id, $source->labels([(string)$user->id]));
-        $source = new \tool_mucohort\muform\autocompletemany\exception_add_userids($cohort->get_id());
+        $source = new \tool_mucohort\muform\autocomplete\exception_add_userids($cohort->get_id());
         $this->assertSame([], $source->validate([(string)$user->id]));
         $standard = $this->getDataGenerator()->create_cohort();
-        $source = new \tool_mucohort\muform\autocompletemany\standard_member_add_userids((int)$standard->id);
+        $source = new \tool_mucohort\muform\autocomplete\standard_member_add_userids((int)$standard->id);
         $this->assertSame([], $source->validate([(string)$user->id]));
         $this->assertArrayHasKey((string)$user->id, $source->search('', 50, []));
 

@@ -57,7 +57,7 @@ final class role_contextid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         $result = $this->search_category_contexts('moodle/role:assign', $query, $maxitems);
         if ($result === null) {
             return null;
@@ -66,7 +66,7 @@ final class role_contextid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         if (!$this->is_tenant_allowed((int)$value)) {
             return null;
         }

@@ -39,7 +39,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(\tool_mucohort\local\rule\include_course_completion::class)]
 #[CoversClass(\tool_mucohort\local\rule\exclude_course_completion::class)]
 #[CoversClass(\tool_mucohort\muform\autocomplete\rule_courseid::class)]
-#[CoversClass(\tool_mucohort\muform\autocompletemany\rule_courseids::class)]
+#[CoversClass(\tool_mucohort\muform\autocomplete\rule_courseids::class)]
 #[Group('MuTMS')]
 final class course_test extends \advanced_testcase {
     /** @var rules */
@@ -163,14 +163,16 @@ final class course_test extends \advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course(['fullname' => 'Alpha']);
         $course2 = $this->getDataGenerator()->create_course(['fullname' => 'Beta']);
 
-        $source = new \tool_mucohort\muform\autocompletemany\rule_courseids($context->id, []);
+        $source = new \tool_mucohort\muform\autocomplete\rule_courseids($context->id, []);
         $this->assertSame([(string)$course1->id => 'Alpha', (string)$course2->id => 'Beta'], $source->search('', 10, []));
         $this->assertSame([(string)$course2->id => 'Beta'], $source->search('bet', 10, []));
         $this->assertSame([(string)$course1->id => 'Alpha'], $source->labels([(string)$course1->id, (string)SITEID, '999999']));
 
         $source = new \tool_mucohort\muform\autocomplete\rule_courseid($context->id, 0);
-        $this->assertSame('Beta', $source->label((string)$course2->id));
-        $this->assertNull($source->label((string)SITEID));
+        $value = (string)$course2->id;
+        $this->assertSame('Beta', $source->labels([$value])[$value] ?? null);
+        $value = (string)SITEID;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         // Other users see only courses where they may view participants, current values stay valid.
         $teacher = $this->getDataGenerator()->create_user();
@@ -179,7 +181,7 @@ final class course_test extends \advanced_testcase {
         assign_capability('tool/mucohort:manage', CAP_ALLOW, $roleid, $context->id);
         $this->getDataGenerator()->role_assign($roleid, $teacher->id, $context->id);
         $this->setUser($teacher);
-        $source = new \tool_mucohort\muform\autocompletemany\rule_courseids($context->id, [(int)$course2->id]);
+        $source = new \tool_mucohort\muform\autocomplete\rule_courseids($context->id, [(int)$course2->id]);
         $this->assertSame([(string)$course1->id => 'Alpha'], $source->search('', 10, []));
         $this->assertSame([(string)$course1->id => 'Alpha', (string)$course2->id => 'Beta'], $source->labels([(string)$course1->id, (string)$course2->id]));
     }

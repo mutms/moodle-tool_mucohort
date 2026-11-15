@@ -37,7 +37,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(\tool_mucohort\local\rule\include_program_completion::class)]
 #[CoversClass(\tool_mucohort\local\rule\exclude_program_completion::class)]
 #[CoversClass(\tool_mucohort\muform\autocomplete\rule_programid::class)]
-#[CoversClass(\tool_mucohort\muform\autocompletemany\rule_programids::class)]
+#[CoversClass(\tool_mucohort\muform\autocomplete\rule_programids::class)]
 #[Group('MuTMS')]
 final class program_test extends \advanced_testcase {
     /** @var rules */
@@ -138,13 +138,14 @@ final class program_test extends \advanced_testcase {
         $program1 = $generator->create_program(['fullname' => 'Alpha', 'contextid' => $catcontext->id]);
         $program2 = $generator->create_program(['fullname' => 'Beta']);
 
-        $source = new \tool_mucohort\muform\autocompletemany\rule_programids($context->id, []);
+        $source = new \tool_mucohort\muform\autocomplete\rule_programids($context->id, []);
         $this->assertSame([(string)$program1->id => 'Alpha', (string)$program2->id => 'Beta'], $source->search('', 10, []));
         $this->assertSame([(string)$program1->id => 'Alpha'], $source->labels([(string)$program1->id, '999999']));
 
         $source = new \tool_mucohort\muform\autocomplete\rule_programid($context->id, 0);
-        $this->assertSame('Beta', $source->label((string)$program2->id));
-        $this->assertNull($source->label('999999'));
+        $value = (string)$program2->id;
+        $this->assertSame('Beta', $source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['999999'])['999999'] ?? null);
 
         // Other users see only programs they may view, current values stay valid.
         $user = $this->getDataGenerator()->create_user();
@@ -155,13 +156,14 @@ final class program_test extends \advanced_testcase {
         assign_capability('tool/muprog:view', CAP_ALLOW, $viewroleid, $catcontext->id);
         $this->getDataGenerator()->role_assign($viewroleid, $user->id, $catcontext->id);
         $this->setUser($user);
-        $source = new \tool_mucohort\muform\autocompletemany\rule_programids($context->id, [(int)$program2->id]);
+        $source = new \tool_mucohort\muform\autocomplete\rule_programids($context->id, [(int)$program2->id]);
         $this->assertSame([(string)$program1->id => 'Alpha'], $source->search('', 10, []));
         $this->assertEqualsCanonicalizing(
             [(string)$program1->id => 'Alpha', (string)$program2->id => 'Beta'],
             $source->labels([(string)$program1->id, (string)$program2->id])
         );
         $source = new \tool_mucohort\muform\autocomplete\rule_programid($context->id, 0);
-        $this->assertNull($source->label((string)$program2->id));
+        $value = (string)$program2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
     }
 }

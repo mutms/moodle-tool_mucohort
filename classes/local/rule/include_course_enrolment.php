@@ -92,7 +92,7 @@ final class include_course_enrolment extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['courseids'] ?? [];
-        $source = new \tool_mucohort\muform\autocompletemany\rule_courseids(
+        $source = new \tool_mucohort\muform\autocomplete\rule_courseids(
             (int)$this->cohort->contextid,
             array_map('intval', $current)
         );

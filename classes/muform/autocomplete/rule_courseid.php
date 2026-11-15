@@ -61,12 +61,12 @@ final class rule_courseid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         return $this->search_courses($this->context, self::CAPABILITY, $query, $maxitems);
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         $current = $this->currentid ? [$this->currentid] : [];
         return $this->course_labels($this->context, self::CAPABILITY, [$value], $current)[$value] ?? null;
     }

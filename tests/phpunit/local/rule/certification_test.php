@@ -37,7 +37,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(\tool_mucohort\local\rule\include_certification::class)]
 #[CoversClass(\tool_mucohort\local\rule\exclude_certification::class)]
 #[CoversClass(\tool_mucohort\muform\autocomplete\rule_certificationid::class)]
-#[CoversClass(\tool_mucohort\muform\autocompletemany\rule_certificationids::class)]
+#[CoversClass(\tool_mucohort\muform\autocomplete\rule_certificationids::class)]
 #[Group('MuTMS')]
 final class certification_test extends \advanced_testcase {
     /** @var rules */
@@ -167,14 +167,15 @@ final class certification_test extends \advanced_testcase {
         $certification1 = $generator->create_certification(['fullname' => 'Alpha', 'contextid' => $catcontext->id]);
         $certification2 = $generator->create_certification(['fullname' => 'Beta']);
 
-        $source = new \tool_mucohort\muform\autocompletemany\rule_certificationids($context->id, []);
+        $source = new \tool_mucohort\muform\autocomplete\rule_certificationids($context->id, []);
         $this->assertSame([(string)$certification1->id => 'Alpha', (string)$certification2->id => 'Beta'], $source->search('', 10, []));
         $this->assertSame([(string)$certification2->id => 'Beta'], $source->search('bet', 10, []));
         $this->assertSame([(string)$certification1->id => 'Alpha'], $source->labels([(string)$certification1->id, '999999']));
 
         $source = new \tool_mucohort\muform\autocomplete\rule_certificationid($context->id, 0);
-        $this->assertSame('Beta', $source->label((string)$certification2->id));
-        $this->assertNull($source->label('999999'));
+        $value = (string)$certification2->id;
+        $this->assertSame('Beta', $source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['999999'])['999999'] ?? null);
 
         // Other users see only certifications they may view, current values stay valid.
         $user = $this->getDataGenerator()->create_user();
@@ -185,13 +186,14 @@ final class certification_test extends \advanced_testcase {
         assign_capability('tool/mucertify:view', CAP_ALLOW, $viewroleid, $catcontext->id);
         $this->getDataGenerator()->role_assign($viewroleid, $user->id, $catcontext->id);
         $this->setUser($user);
-        $source = new \tool_mucohort\muform\autocompletemany\rule_certificationids($context->id, [(int)$certification2->id]);
+        $source = new \tool_mucohort\muform\autocomplete\rule_certificationids($context->id, [(int)$certification2->id]);
         $this->assertSame([(string)$certification1->id => 'Alpha'], $source->search('', 10, []));
         $this->assertEqualsCanonicalizing(
             [(string)$certification1->id => 'Alpha', (string)$certification2->id => 'Beta'],
             $source->labels([(string)$certification1->id, (string)$certification2->id])
         );
         $source = new \tool_mucohort\muform\autocomplete\rule_certificationid($context->id, 0);
-        $this->assertNull($source->label((string)$certification2->id));
+        $value = (string)$certification2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
     }
 }

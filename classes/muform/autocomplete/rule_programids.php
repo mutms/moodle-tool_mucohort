@@ -16,25 +16,25 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocompletemany;
+namespace tool_mucohort\muform\autocomplete;
 
-use tool_mucertify\muform\util\autocomplete\certification_trait;
+use tool_muprog\muform\util\autocomplete\program_trait;
 
 /**
- * Certifications of certification rules - any certification the user may view.
+ * Programs of program rules - any program the user may view.
  *
- * Certifications already used by the rule stay valid even if the current user cannot see them,
+ * Programs already used by the rule stay valid even if the current user cannot see them,
  * because rules may be edited by several people.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class rule_certificationids extends \tool_mulib\muform\autocompletemany\base {
-    use certification_trait;
+final class rule_programids extends \tool_mulib\muform\autocomplete\base {
+    use program_trait;
 
-    /** @var string capability required in certification context */
-    private const string CAPABILITY = 'tool/mucertify:view';
+    /** @var string capability required in program context */
+    private const string CAPABILITY = 'tool/muprog:view';
 
     /** @var \core\context context of the rule-based cohort */
     private \core\context $context;
@@ -43,12 +43,12 @@ final class rule_certificationids extends \tool_mulib\muform\autocompletemany\ba
      * Constructor.
      *
      * @param int $contextid context of the rule-based cohort
-     * @param int[] $currentids certification ids used by the rule
+     * @param int[] $currentids program ids used by the rule
      */
     public function __construct(
         /** @var int context id */
         private readonly int $contextid,
-        /** @var int[] current certification ids */
+        /** @var int[] current program ids */
         private readonly array $currentids
     ) {
         $this->context = \core\context::instance_by_id($contextid);
@@ -62,18 +62,18 @@ final class rule_certificationids extends \tool_mulib\muform\autocompletemany\ba
 
     #[\Override]
     public function search(string $query, int $maxitems, array $exclude): ?array {
-        $where = self::get_certification_tenant_where($this->context, false);
-        return $this->search_certifications(self::CAPABILITY, $query, $maxitems, $exclude, $where);
+        $where = self::get_program_tenant_where($this->context, false);
+        return $this->search_programs(self::CAPABILITY, $query, $maxitems, $exclude, $where);
     }
 
     #[\Override]
     public function labels(array $values): array {
-        $where = self::get_certification_tenant_where($this->context, false);
-        return $this->current_labels($values) + $this->certification_labels(self::CAPABILITY, $values, $where);
+        $where = self::get_program_tenant_where($this->context, false);
+        return $this->current_labels($values) + $this->program_labels(self::CAPABILITY, $values, $where);
     }
 
     /**
-     * Labels of certifications already used by the rule, whatever changed since.
+     * Labels of programs already used by the rule, whatever changed since.
      *
      * @param string[] $ids
      * @return array [id => label html]
@@ -85,9 +85,8 @@ final class rule_certificationids extends \tool_mulib\muform\autocompletemany\ba
             return [];
         }
         $result = [];
-        $certifications = $DB->get_records_list('tool_mucertify_certification', 'id', $ids, 'id ASC', 'id, fullname, contextid');
-        foreach ($certifications as $certification) {
-            $result[(string)$certification->id] = self::format_certification_label($certification);
+        foreach ($DB->get_records_list('tool_muprog_program', 'id', $ids, 'id ASC', 'id, fullname, contextid') as $program) {
+            $result[(string)$program->id] = self::format_program_label($program);
         }
         return $result;
     }

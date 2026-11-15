@@ -76,7 +76,7 @@ final class include_program_completion extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['programids'] ?? [];
-        $source = new \tool_mucohort\muform\autocompletemany\rule_programids(
+        $source = new \tool_mucohort\muform\autocomplete\rule_programids(
             (int)$this->cohort->contextid,
             array_map('intval', $current)
         );

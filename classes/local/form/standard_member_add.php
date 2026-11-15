@@ -23,7 +23,7 @@ use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
-use tool_mucohort\muform\autocompletemany\standard_member_add_userids;
+use tool_mucohort\muform\autocomplete\standard_member_add_userids;
 
 /**
  * Add standard cohort members.

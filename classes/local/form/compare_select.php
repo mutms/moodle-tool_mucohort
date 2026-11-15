@@ -22,7 +22,7 @@ use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
-use tool_mucohort\muform\autocompletemany\compare_cohortids;
+use tool_mucohort\muform\autocomplete\compare_cohortids;
 
 /**
  * Select cohorts to compare with.

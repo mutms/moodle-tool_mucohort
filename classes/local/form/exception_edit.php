@@ -27,7 +27,7 @@ use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\textarea;
 use tool_mulib\muform\form;
 use tool_mucohort\local\exception;
-use tool_mucohort\muform\autocompletemany\exception_add_userids;
+use tool_mucohort\muform\autocomplete\exception_add_userids;
 
 /**
  * Add or update exceptions.

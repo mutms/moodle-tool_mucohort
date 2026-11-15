@@ -61,13 +61,13 @@ final class rule_programid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         $where = self::get_program_tenant_where($this->context, false);
         return $this->search_programs(self::CAPABILITY, $query, $maxitems, [], $where);
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         $label = $this->current_labels([$value])[$value] ?? null;
         return $label ?? $this->program_label(self::CAPABILITY, $value, self::get_program_tenant_where($this->context, false));
     }

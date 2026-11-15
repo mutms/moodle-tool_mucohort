@@ -63,12 +63,12 @@ final class access_add_userid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         return $this->search_users($this->cohort->get_context(), $query, $maxitems, [], $this->get_where());
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         return $this->user_labels($this->cohort->get_context(), [$value], $this->get_where())[$value] ?? null;
     }
 
