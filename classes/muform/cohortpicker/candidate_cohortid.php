@@ -16,39 +16,37 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocomplete;
+namespace tool_mucohort\muform\cohortpicker;
 
-use tool_mulib\muform\util\autocomplete\cohort_trait;
+use core\context;
 
 /**
- * Candidate cohort of advanced cohort - any cohort the user may see.
+ * Candidate cohort of advanced cohort - any cohort the user may use.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class candidate_cohortid extends \tool_mulib\muform\autocomplete\base {
-    use cohort_trait;
-
-    /** @var \core\context context of the advanced cohort */
-    private \core\context $context;
+final class candidate_cohortid extends \tool_mulib\muform\cohortpicker\base {
+    /** @var context context of the advanced cohort */
+    private context $context;
 
     /**
      * Constructor.
      *
      * @param int $contextid context of the advanced cohort
-     * @param int $cohortid advanced cohort id, 0 when creating new cohort
-     * @param int $currentid current candidate cohort, it stays selectable even if not visible any more
+     * @param int $cohortid advanced cohort id, 0 when cohort is not saved yet
+     * @param int $currentid current candidate cohort, it stays valid even if it cannot be used any more
      */
     public function __construct(
         /** @var int context id */
         private readonly int $contextid,
         /** @var int advanced cohort id */
         private readonly int $cohortid = 0,
-        /** @var int current candidate cohort id */
+        /** @var int current cohort id */
         private readonly int $currentid = 0
     ) {
-        $this->context = \core\context::instance_by_id($contextid);
+        $this->context = context::instance_by_id($contextid);
         require_capability('tool/mucohort:manage', $this->context);
     }
 
@@ -58,17 +56,27 @@ final class candidate_cohortid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        $exclude = $this->cohortid ? [(string)$this->cohortid] : [];
-        return $this->search_cohorts($this->context, $query, $maxitems, $exclude);
+    protected function get_context(): context {
+        return $this->context;
     }
 
+    /**
+     * The cohort already used stays valid.
+     *
+     * @return int[]
+     */
     #[\Override]
-    protected function label_value(string $value): ?string {
-        if ($this->cohortid && $value === (string)$this->cohortid) {
-            return null;
-        }
-        $current = $this->currentid ? [$this->currentid] : [];
-        return $this->cohort_labels($this->context, [$value], $current)[$value] ?? null;
+    protected function get_current_cohortids(): array {
+        return $this->currentid ? [$this->currentid] : [];
+    }
+
+    /**
+     * The advanced cohort itself cannot be picked.
+     *
+     * @return int[]
+     */
+    #[\Override]
+    protected function get_excluded_cohortids(): array {
+        return $this->cohortid ? [$this->cohortid] : [];
     }
 }

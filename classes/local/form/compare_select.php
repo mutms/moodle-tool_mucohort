@@ -18,11 +18,11 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\cohortpickermany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
-use tool_mucohort\muform\autocomplete\compare_cohortids;
+use tool_mucohort\muform\cohortpicker\compare_cohortids;
 
 /**
  * Select cohorts to compare with.
@@ -36,7 +36,7 @@ final class compare_select extends form {
     protected function definition(): void {
         $cohortid = (int)$this->get_current_data()['cohortid'];
 
-        $withids = new autocompletemany('withids', get_string('compare_with', 'tool_mucohort'), new compare_cohortids($cohortid));
+        $withids = new cohortpickermany('withids', get_string('compare_with', 'tool_mucohort'), new compare_cohortids($cohortid));
         $withids->set_required(true);
         $this->add($withids);
 

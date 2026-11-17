@@ -20,7 +20,7 @@ namespace tool_mucohort\local\rule;
 
 use stdClass;
 use tool_mulib\local\sql;
-use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\cohortpickermany;
 use tool_mulib\muform\form;
 
 /**
@@ -74,12 +74,12 @@ final class include_cohort extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['cohortids'] ?? [];
-        $source = new \tool_mucohort\muform\autocomplete\rule_cohortids(
+        $source = new \tool_mucohort\muform\cohortpicker\rule_cohortids(
             (int)$this->cohort->contextid,
             (int)$this->cohort->id,
-            array_map('intval', $current)
+            implode(',', array_map('intval', $current))
         );
-        $cohortids = new autocompletemany('cohortids', get_string('cohorts', 'core_cohort'), $source);
+        $cohortids = new cohortpickermany('cohortids', get_string('cohorts', 'core_cohort'), $source);
         $cohortids->set_required(true);
         $form->add($cohortids);
     }

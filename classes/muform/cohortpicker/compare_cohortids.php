@@ -16,10 +16,12 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_mucohort\muform\autocomplete;
+namespace tool_mucohort\muform\cohortpicker;
 
+use core\context;
 use tool_mucohort\local\type\base;
-use tool_mulib\muform\util\autocomplete\cohort_trait;
+use tool_mulib\local\cohort_util;
+use tool_mulib\local\sql;
 
 /**
  * Cohorts to compare with - only cohorts with members visible to the current user.
@@ -28,10 +30,8 @@ use tool_mulib\muform\util\autocomplete\cohort_trait;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class compare_cohortids extends \tool_mulib\muform\autocomplete\base {
-    use cohort_trait;
-
-    /** @var base */
+final class compare_cohortids extends \tool_mulib\muform\cohortpicker\base {
+    /** @var base target cohort */
     private base $cohort;
 
     /**
@@ -61,30 +61,23 @@ final class compare_cohortids extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        $exclude[] = (string)$this->cohortid;
-        $result = $this->search_cohorts($this->cohort->get_context(), $query, $maxitems, $exclude);
-        if ($result === null) {
-            return null;
-        }
-        return array_filter($result, fn($id) => self::can_compare((int)$id), ARRAY_FILTER_USE_KEY);
-    }
-
-    #[\Override]
-    public function labels(array $values): array {
-        $values = array_filter($values, fn($id) => $id !== (string)$this->cohortid);
-        $labels = $this->cohort_labels($this->cohort->get_context(), $values);
-        return array_filter($labels, fn($id) => self::can_compare((int)$id), ARRAY_FILTER_USE_KEY);
+    protected function get_context(): context {
+        return $this->cohort->get_context();
     }
 
     /**
-     * May the current user see members of the cohort?
+     * The target cohort cannot be compared with itself.
      *
-     * @param int $cohortid
-     * @return bool
+     * @return int[]
      */
-    private static function can_compare(int $cohortid): bool {
-        $cohort = base::fetch($cohortid, IGNORE_MISSING);
-        return $cohort && $cohort->can_view_members();
+    #[\Override]
+    protected function get_excluded_cohortids(): array {
+        return [$this->cohortid];
+    }
+
+    #[\Override]
+    protected function get_restriction_sql(): ?sql {
+        global $USER;
+        return cohort_util::get_view_members_sql('ch', (int)$USER->id);
     }
 }

@@ -18,13 +18,13 @@
 
 namespace tool_mucohort\local\form;
 
-use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\cohortpicker;
 use tool_mulib\muform\element\editor;
 use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\text;
 use tool_mulib\muform\element\radiocards;
 use tool_mucohort\local\type\base;
-use tool_mucohort\muform\autocomplete\candidate_cohortid;
+use tool_mucohort\muform\cohortpicker\candidate_cohortid;
 
 /**
  * Core cohort settings shared by create and update forms of all types.
@@ -78,7 +78,7 @@ trait cohort_trait {
      */
     protected function add_candidate_element(int $contextid, int $cohortid, int $candidatecohortid): void {
         $source = new candidate_cohortid($contextid, $cohortid, $candidatecohortid);
-        $candidate = new autocomplete('candidatecohortid', get_string('candidatecohort', 'tool_mucohort'), $source);
+        $candidate = new cohortpicker('candidatecohortid', get_string('candidatecohort', 'tool_mucohort'), $source);
         $candidate->add_help_button('candidatecohort', 'tool_mucohort');
         $this->add($candidate);
     }

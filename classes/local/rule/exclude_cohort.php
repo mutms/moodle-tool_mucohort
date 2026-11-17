@@ -20,7 +20,7 @@ namespace tool_mucohort\local\rule;
 
 use stdClass;
 use tool_mulib\local\sql;
-use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\cohortpicker;
 use tool_mulib\muform\form;
 
 /**
@@ -73,12 +73,12 @@ final class exclude_cohort extends base {
     #[\Override]
     public function add_form_elements(form $form): void {
         $current = $form->get_current_data()['cohortid'] ?? 0;
-        $source = new \tool_mucohort\muform\autocomplete\rule_cohortid(
+        $source = new \tool_mucohort\muform\cohortpicker\rule_cohortid(
             (int)$this->cohort->contextid,
             (int)$this->cohort->id,
             (int)$current
         );
-        $cohortid = new autocomplete('cohortid', get_string('cohort', 'core_cohort'), $source);
+        $cohortid = new cohortpicker('cohortid', get_string('cohort', 'core_cohort'), $source);
         $cohortid->set_required(true);
         $form->add($cohortid);
     }
