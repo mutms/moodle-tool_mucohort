@@ -39,8 +39,10 @@ in standard Moodle cohorts, without replacing them and without any core modifica
 
 ## Who may use a cohort
 
-Using a cohort means selecting it in other MuTMS plugins, for example as a source of program allocations,
-in visibility rules or when adding its members somewhere.
+Using a cohort means selecting it in MuTMS plugins, for example as a source of program allocations,
+in visibility rules, in rules of other cohorts or when adding its members somewhere. Cohorts are selected in
+the cohort picker, a panel with cohorts in the tree of course categories that offers only the cohorts
+the user may use.
 
 | Cohort | May use |
 |---|---|
@@ -57,13 +59,17 @@ Recommendations:
 * "Use cohort" does not allow viewing of members and the other permissions do not allow using the cohort.
   An access record without any permission, for example of a curator, only lets the user find the cohort
   in cohort management.
+* A cohort that was selected earlier stays in the form when somebody without permission to use it edits
+  the item, it only cannot be selected again after it is removed.
+* With multi-tenancy cohorts of other tenants cannot be used in items that belong to a tenant.
 
 Standard Moodle features and plugins outside of MuTMS, such as cohort enrolment, know nothing about access
 records: they offer visible cohorts and cohorts in contexts with `moodle/cohort:view`.
 
 For developers: the rule is `can_use()` of the cohort type classes. Other MuTMS plugins use
 `tool_mulib\local\cohort_util::can_use()` and the SQL condition `cohort_util::get_use_sql()`; the three
-must be kept in sync.
+must be kept in sync. Forms use `cohortpicker` and `cohortpickermany` elements of tool_mulib, their source base
+`tool_mulib\muform\cohortpicker\base` applies the rule; web services check `cohort_util::can_use()`.
 
 ## Who may view cohort members
 
@@ -76,9 +82,13 @@ Cohort visibility, `moodle/cohort:view` and access records without "View members
 of cohort members. Managing members or exceptions in an access record always includes "View members".
 Without this plugin only `moodle/cohort:assign` allows listing of members, the same as in standard cohort pages.
 
+The same permission is required wherever members of a cohort would be revealed without opening it: in the "Cohort"
+filter of user pickers, and in the compare tool, where the other cohorts must be both usable and have
+visible members.
+
 For developers: the rule is `can_view_members()` of the cohort type classes. Other MuTMS plugins use
-`tool_mulib\local\cohort_util::can_view_members()` and the SQL condition `cohort_util::get_view_members_sql()`,
-for example in the "Cohort" filter of user pickers; the three must be kept in sync.
+`tool_mulib\local\cohort_util::can_view_members()` and the SQL condition `cohort_util::get_view_members_sql()`;
+the three must be kept in sync.
 
 ## Requirements
 
