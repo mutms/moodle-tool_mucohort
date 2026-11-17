@@ -23,8 +23,8 @@ namespace tool_mucohort\phpunit\local;
 use tool_mucohort\local\access;
 use tool_mucohort\local\type\curated;
 use tool_mulib\local\cohort_util;
+use tool_mulib\muform\cohortpicker\context_cohorts;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -35,7 +35,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[CoversClass(\tool_mulib\local\cohort_util::class)]
-#[CoversTrait(\tool_mulib\muform\util\autocomplete\cohort_trait::class)]
+#[CoversClass(\tool_mulib\muform\cohortpicker\base::class)]
 #[Group('MuTMS')]
 final class cohort_lookup_test extends \advanced_testcase {
     public function setUp(): void {
@@ -54,56 +54,41 @@ final class cohort_lookup_test extends \advanced_testcase {
         $curated = $DB->get_record('cohort', ['id' => $cohort->get_id()], '*', MUST_EXIST);
         $user = $this->getDataGenerator()->create_user();
 
-        $picker = new class {
-            use \tool_mulib\muform\util\autocomplete\cohort_trait;
-
-            /**
-             * Search.
-             *
-             * @param string $query
-             * @return array|null
-             */
-            public function search(string $query): ?array {
-                return $this->search_cohorts(\core\context\system::instance(), $query, 10);
-            }
-
-            /**
-             * Validate.
-             *
-             * @param array $ids
-             * @return array
-             */
-            public function validate(array $ids): array {
-                return $this->validate_cohorts(\core\context\system::instance(), $ids);
-            }
+        $search = function (): array {
+            $source = new context_cohorts((int)\core\context\system::instance()->id);
+            return array_column($source->search('', [])['cohorts'], 'id');
+        };
+        $refused = function (array $ids): array {
+            $source = new context_cohorts((int)\core\context\system::instance()->id);
+            return array_values(array_diff($ids, array_map('strval', array_keys($source->labels($ids)))));
         };
 
         $this->setUser($user);
-        $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
+        $this->assertSame([(int)$visible->id], $search());
         $this->assertFalse(cohort_util::can_use($curated));
-        $this->assertSame([(int)$curated->id], array_keys($picker->validate([(string)$curated->id])));
+        $this->assertSame([(string)$curated->id], $refused([(string)$curated->id]));
 
         // Access records without the permission do not allow use of the hidden advanced cohort.
         $this->setAdminUser();
         access::set($cohort, $user->id, ['viewmembers', 'managemembers', 'manageexceptions'], true);
         $this->setUser($user);
-        $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
+        $this->assertSame([(int)$visible->id], $search());
         $this->assertFalse(cohort_util::can_use($curated));
-        $this->assertSame([(int)$curated->id], array_keys($picker->validate([(string)$curated->id])));
+        $this->assertSame([(string)$curated->id], $refused([(string)$curated->id]));
 
         $this->setAdminUser();
         access::set($cohort, $user->id, ['usecohort'], false);
         $this->setUser($user);
-        $this->assertSame([(int)$curated->id, (int)$visible->id], array_keys($picker->search('')));
+        $this->assertSame([(int)$curated->id, (int)$visible->id], $search());
         $this->assertTrue(cohort_util::can_use($curated));
-        $this->assertSame([], $picker->validate([(string)$curated->id]));
-        $this->assertSame([(int)$hidden->id], array_keys($picker->validate([(string)$hidden->id])));
+        $this->assertSame([], $refused([(string)$curated->id]));
+        $this->assertSame([(string)$hidden->id], $refused([(string)$hidden->id]));
 
         // Access records of converted cohorts are ignored.
         $DB->set_field('cohort', 'component', '', ['id' => $curated->id]);
         $curated = $DB->get_record('cohort', ['id' => $curated->id], '*', MUST_EXIST);
         $this->assertFalse(cohort_util::can_use($curated));
-        $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
+        $this->assertSame([(int)$visible->id], $search());
     }
 
     public function test_use(): void {
