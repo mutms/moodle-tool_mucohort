@@ -103,7 +103,7 @@ $handler = $handler ?? handler::from_request();
 
 $current = [
     'contextid' => $context->id,
-    'visible' => 1,
+    'visible' => 0,
     'descriptionformat' => FORMAT_HTML,
     'descriptionfilearea' => new file_area($context, 'cohort', 'description', null),
 ];

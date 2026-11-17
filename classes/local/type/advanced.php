@@ -139,6 +139,14 @@ abstract class advanced extends base {
     }
 
     #[\Override]
+    public function can_use(): bool {
+        if (parent::can_use()) {
+            return true;
+        }
+        return access::has_flag($this, 'usecohort');
+    }
+
+    #[\Override]
     public function can_view_members(): bool {
         if (has_capability('tool/mucohort:viewmembers', $this->get_context())) {
             return true;
@@ -177,6 +185,7 @@ abstract class advanced extends base {
      */
     public function get_access_flags(): array {
         return [
+            'usecohort' => get_string('access_usecohort', 'tool_mucohort'),
             'viewmembers' => get_string('access_viewmembers', 'tool_mucohort'),
             'manageexceptions' => get_string('access_manageexceptions', 'tool_mucohort'),
         ];

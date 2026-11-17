@@ -29,8 +29,8 @@ Feature: Delegated access to advanced cohorts via access records
       | iscurator   | 1         |
     And I click on "Grant access" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "reportbuilder-table" table:
-      | First name | Curator | View members |
-      | Del Egate  | Yes     | No           |
+      | First name | Curator | Use cohort | View members |
+      | Del Egate  | Yes     | No         | No           |
     And I click on "Overview" "link" in the ".secondary-navigation" "css_element"
     And I should see "Del Egate"
     And I log out
@@ -60,11 +60,11 @@ Feature: Delegated access to advanced cohorts via access records
     And I click on "Update access" "button" in the "dialog[open]" "css_element"
     And I should see "View members is required for managing members or exceptions" in the "dialog[open]" "css_element"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Permissions | viewmembers |
+      | Permissions | usecohort, viewmembers |
     And I click on "Update access" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "reportbuilder-table" table:
-      | First name | Curator | View members |
-      | Del Egate  | Yes     | Yes          |
+      | First name | Curator | Use cohort | View members |
+      | Del Egate  | Yes     | Yes        | Yes          |
     And I press "+ Add filter"
     And I click on "Manage members" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
     And I click on "Yes" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"

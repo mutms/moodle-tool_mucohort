@@ -24,7 +24,8 @@ use stdClass;
 /**
  * Per-cohort access records of advanced cohorts.
  *
- * Any access record allows finding and using the cohort, flags add more operations.
+ * Any access record allows finding the cohort in cohort management, flags add operations:
+ * using the cohort in other MuTMS plugins, viewing and managing of members and managing of exceptions.
  * The curator is an honorary title that does not grant any permissions automatically.
  * Access records are changed only by users with tool/mucohort:manageaccess capability.
  *
@@ -34,7 +35,7 @@ use stdClass;
  */
 final class access {
     /** @var string[] permission flags of access records */
-    public const array FLAGS = ['viewmembers', 'managemembers', 'manageexceptions'];
+    public const array FLAGS = ['usecohort', 'viewmembers', 'managemembers', 'manageexceptions'];
 
     /**
      * Returns access record of the user.

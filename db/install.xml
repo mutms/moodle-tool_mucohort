@@ -19,15 +19,16 @@
         <KEY NAME="candidatecohortid" TYPE="foreign" FIELDS="candidatecohortid" REFTABLE="cohort" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="tool_mucohort_access" COMMENT="Explicit per-cohort access, changed only by users with capabilities; any record allows finding and using the cohort">
+    <TABLE NAME="tool_mucohort_access" COMMENT="Explicit per-cohort access, changed only by users with capabilities; any record allows finding the cohort in cohort management">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="mucohortid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="iscurator" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1 marks the one person shown as responsible for the cohort, NULL otherwise; honorary title that does not grant any permissions automatically, the curator may receive notifications"/>
+        <FIELD NAME="usecohort" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may use the cohort in other MuTMS plugins, for example as a source of program allocations; independent of the other permissions"/>
         <FIELD NAME="viewmembers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may list members and explain membership; implied by managemembers and manageexceptions"/>
         <FIELD NAME="managemembers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may add and remove members of curated cohorts, within the limits of candidates and forced/blocked users"/>
-        <FIELD NAME="manageexceptions" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may manage forced and blocked users; all flags 0 means the user may only find and use the cohort, for example in enrolment methods"/>
+        <FIELD NAME="manageexceptions" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 means user may manage forced and blocked users; all flags 0 means the user may only find the cohort in cohort management"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who made the last change, NULL if unknown or deleted"/>

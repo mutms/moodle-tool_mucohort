@@ -23,7 +23,6 @@ namespace tool_mucohort\phpunit\local;
 use tool_mucohort\local\access;
 use tool_mucohort\local\type\curated;
 use tool_mulib\local\cohort_util;
-use tool_mulib\local\search_util;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -36,7 +35,6 @@ use PHPUnit\Framework\Attributes\Group;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[CoversClass(\tool_mulib\local\cohort_util::class)]
-#[CoversClass(\tool_mulib\local\search_util::class)]
 #[CoversTrait(\tool_mulib\muform\util\autocomplete\cohort_trait::class)]
 #[Group('MuTMS')]
 final class cohort_lookup_test extends \advanced_testcase {
@@ -82,30 +80,107 @@ final class cohort_lookup_test extends \advanced_testcase {
 
         $this->setUser($user);
         $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
-        $this->assertFalse(search_util::is_cohort_visible($curated));
-        $this->assertFalse(cohort_util::has_access_record($curated, (int)$user->id));
+        $this->assertFalse(cohort_util::can_use($curated));
         $this->assertSame([(int)$curated->id], array_keys($picker->validate([(string)$curated->id])));
 
-        // Any access record allows use of the hidden advanced cohort.
+        // Access records without the permission do not allow use of the hidden advanced cohort.
         $this->setAdminUser();
-        access::set($cohort, $user->id, [], false);
+        access::set($cohort, $user->id, ['viewmembers', 'managemembers', 'manageexceptions'], true);
+        $this->setUser($user);
+        $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
+        $this->assertFalse(cohort_util::can_use($curated));
+        $this->assertSame([(int)$curated->id], array_keys($picker->validate([(string)$curated->id])));
+
+        $this->setAdminUser();
+        access::set($cohort, $user->id, ['usecohort'], false);
         $this->setUser($user);
         $this->assertSame([(int)$curated->id, (int)$visible->id], array_keys($picker->search('')));
-        $this->assertTrue(search_util::is_cohort_visible($curated));
-        $this->assertTrue(cohort_util::has_access_record($curated, (int)$user->id));
+        $this->assertTrue(cohort_util::can_use($curated));
         $this->assertSame([], $picker->validate([(string)$curated->id]));
         $this->assertSame([(int)$hidden->id], array_keys($picker->validate([(string)$hidden->id])));
 
         // Access records of converted cohorts are ignored.
-        $this->assertFalse(cohort_util::has_access_record($hidden, (int)$user->id));
         $DB->set_field('cohort', 'component', '', ['id' => $curated->id]);
         $curated = $DB->get_record('cohort', ['id' => $curated->id], '*', MUST_EXIST);
-        $this->assertFalse(cohort_util::has_access_record($curated, (int)$user->id));
+        $this->assertFalse(cohort_util::can_use($curated));
         $this->assertSame([(int)$visible->id], array_keys($picker->search('')));
+    }
 
-        // Guests never have access records.
-        $this->assertSame('1=2', cohort_util::get_access_record_sql('c', (int)guest_user()->id)->sql);
-        $this->assertSame('1=2', cohort_util::get_access_record_sql('c', 0)->sql);
+    public function test_use(): void {
+        global $DB;
+
+        $syscontext = \core\context\system::instance();
+        $category = $this->getDataGenerator()->create_category();
+        $catcontext = \core\context\coursecat::instance($category->id);
+        $this->setAdminUser();
+        $cohorts = [];
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Visible']);
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Standard', 'visible' => 0]);
+        $cohorts[] = $this->getDataGenerator()->create_cohort(
+            ['name' => 'Standard in category', 'visible' => 0, 'contextid' => $catcontext->id]
+        );
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Plugin', 'visible' => 0, 'component' => 'enrol_database']);
+        $curated1 = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Curated 1', 'visible' => 0]);
+        $curated2 = curated::create((object)['contextid' => $catcontext->id, 'name' => 'Curated 2', 'visible' => 0]);
+        $curated3 = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Curated 3', 'visible' => 1]);
+        $rules = \tool_mucohort\local\type\rules::create((object)['contextid' => $syscontext->id, 'name' => 'Rules', 'visible' => 0]);
+        $broken = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Broken', 'visible' => 0]);
+        $DB->delete_records('tool_mucohort', ['cohortid' => $broken->get_id()]);
+        foreach ([$curated1, $curated2, $curated3, $rules, $broken] as $cohort) {
+            $cohorts[] = $DB->get_record('cohort', ['id' => $cohort->get_id()], '*', MUST_EXIST);
+        }
+
+        $generator = $this->getDataGenerator();
+        $users = ['nobody' => $generator->create_user(), 'admin' => get_admin(), 'guest' => guest_user()];
+        $roles = [
+            'view' => ['moodle/cohort:view', $syscontext],
+            'viewcat' => ['moodle/cohort:view', $catcontext],
+            'assign' => ['moodle/cohort:assign', $syscontext],
+            'viewmembers' => ['tool/mucohort:viewmembers', $syscontext],
+        ];
+        foreach ($roles as $name => [$capability, $context]) {
+            $users[$name] = $generator->create_user();
+            $roleid = $generator->create_role();
+            assign_capability($capability, CAP_ALLOW, $roleid, $context);
+            role_assign($roleid, $users[$name]->id, $context);
+        }
+        $users['other'] = $generator->create_user();
+        access::set($curated1, $users['other']->id, ['viewmembers', 'managemembers', 'manageexceptions'], true);
+        access::set($rules, $users['other']->id, ['viewmembers'], false);
+        $users['use'] = $generator->create_user();
+        access::set($curated1, $users['use']->id, ['usecohort'], false);
+        access::set($curated2, $users['use']->id, ['usecohort', 'viewmembers'], false);
+        access::set($rules, $users['use']->id, ['usecohort'], false);
+        access::set($broken, $users['use']->id, ['usecohort'], false);
+
+        $names = function (\stdClass $user) use ($DB): array {
+            $sql = (new \tool_mulib\local\sql("SELECT ch.name FROM {cohort} ch WHERE /* use */ ORDER BY ch.id"))
+                ->replace_comment('use', cohort_util::get_use_sql('ch', (int)$user->id));
+            return $DB->get_fieldset_sql($sql->sql, $sql->params);
+        };
+
+        $all = array_column($cohorts, 'name');
+        $visible = ['Visible', 'Curated 3'];
+        $this->assertSame($visible, $names($users['nobody']));
+        $this->assertSame($visible, $names($users['guest']));
+        $this->assertSame($visible, $names($users['assign']));
+        $this->assertSame($visible, $names($users['viewmembers']));
+        $this->assertSame($visible, $names($users['other']));
+        $this->assertSame($all, $names($users['admin']));
+        $this->assertSame($all, $names($users['view']));
+        $this->assertSame(['Visible', 'Standard in category', 'Curated 2', 'Curated 3'], $names($users['viewcat']));
+        $this->assertSame(['Visible', 'Curated 1', 'Curated 2', 'Curated 3', 'Rules'], $names($users['use']));
+
+        // The SQL and can_use() of the cohort types are the same rule.
+        foreach ($users as $user) {
+            $this->setUser($user);
+            $expected = $names($user);
+            foreach ($cohorts as $cohort) {
+                $allowed = in_array($cohort->name, $expected, true);
+                $this->assertSame($allowed, \tool_mucohort\local\type\base::from_record($cohort)->can_use(), $cohort->name);
+                $this->assertSame($allowed, cohort_util::can_use($cohort), $cohort->name);
+            }
+        }
     }
 
     public function test_view_members(): void {

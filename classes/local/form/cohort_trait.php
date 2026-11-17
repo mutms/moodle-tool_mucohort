@@ -22,7 +22,7 @@ use tool_mulib\muform\element\autocomplete;
 use tool_mulib\muform\element\editor;
 use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\text;
-use tool_mulib\muform\element\yesno;
+use tool_mulib\muform\element\radiocards;
 use tool_mucohort\local\type\base;
 use tool_mucohort\muform\autocomplete\candidate_cohortid;
 
@@ -52,8 +52,12 @@ trait cohort_trait {
     protected function add_settings_elements(): void {
         global $CFG;
 
-        $visible = new yesno('visible', get_string('visible', 'core_cohort'));
-        $visible->add_help_button('visible', 'core_cohort');
+        $visible = new radiocards(
+            'visible',
+            get_string('visible', 'core_cohort'),
+            ['0' => get_string('visible_hidden', 'tool_mucohort'), '1' => get_string('visible_visible', 'tool_mucohort')],
+            ['0' => get_string('visible_hidden_desc', 'tool_mucohort'), '1' => get_string('visible_visible_desc', 'tool_mucohort')]
+        );
         $this->add($visible);
 
         if (!empty($CFG->allowcohortthemes)) {

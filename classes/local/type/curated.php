@@ -114,6 +114,7 @@ final class curated extends advanced {
     #[\Override]
     public function get_access_flags(): array {
         return [
+            'usecohort' => get_string('access_usecohort', 'tool_mucohort'),
             'viewmembers' => get_string('access_viewmembers', 'tool_mucohort'),
             'managemembers' => get_string('access_managemembers', 'tool_mucohort'),
             'manageexceptions' => get_string('access_manageexceptions', 'tool_mucohort'),

@@ -54,6 +54,7 @@ final class access_test extends \advanced_testcase {
         $record = access::set($cohort, $user1->id, [], false);
         $this->assertSame((string)$user1->id, (string)$record->userid);
         $this->assertNull($record->iscurator);
+        $this->assertSame('0', (string)$record->usecohort);
         $this->assertSame('0', (string)$record->viewmembers);
         $this->assertSame('0', (string)$record->managemembers);
         $this->assertSame('0', (string)$record->manageexceptions);
@@ -62,6 +63,12 @@ final class access_test extends \advanced_testcase {
         // Update keeps the record.
         $record2 = access::set($cohort, $user1->id, ['viewmembers', 'managemembers'], true);
         $this->assertSame($record->id, $record2->id);
+        $this->assertSame('0', (string)$record2->usecohort);
+        $record2 = access::set($cohort, $user1->id, ['usecohort'], false);
+        $this->assertSame('1', (string)$record2->usecohort);
+        $this->assertSame('0', (string)$record2->viewmembers);
+        $this->assertTrue(access::has_flag($cohort, 'usecohort', $user1->id));
+        $record2 = access::set($cohort, $user1->id, ['viewmembers', 'managemembers'], true);
         $this->assertSame('1', (string)$record2->viewmembers);
         $this->assertSame('1', (string)$record2->managemembers);
         $this->assertSame('1', (string)$record2->iscurator);
@@ -104,7 +111,9 @@ final class access_test extends \advanced_testcase {
 
     public function test_are_flags_valid(): void {
         $this->assertTrue(access::are_flags_valid([]));
+        $this->assertTrue(access::are_flags_valid(['usecohort']));
         $this->assertTrue(access::are_flags_valid(['viewmembers']));
+        $this->assertFalse(access::are_flags_valid(['usecohort', 'managemembers']));
         $this->assertTrue(access::are_flags_valid(['viewmembers', 'managemembers', 'manageexceptions']));
         $this->assertFalse(access::are_flags_valid(['managemembers']));
         $this->assertFalse(access::are_flags_valid(['manageexceptions']));
@@ -114,16 +123,18 @@ final class access_test extends \advanced_testcase {
     public function test_permissions(): void {
         $category = $this->getDataGenerator()->create_category();
         $catcontext = \core\context\coursecat::instance($category->id);
-        $cohort = curated::create((object)['contextid' => $catcontext->id, 'name' => 'Curated']);
+        $cohort = curated::create((object)['contextid' => $catcontext->id, 'name' => 'Curated', 'visible' => 0]);
         $user = $this->getDataGenerator()->create_user();
         $other = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
         $this->assertFalse($cohort->can_view());
+        $this->assertFalse($cohort->can_use());
         $this->assertFalse(management::can_view_index($catcontext));
 
         access::set($cohort, $user->id, [], false);
         $this->assertTrue($cohort->can_view());
+        $this->assertFalse($cohort->can_use());
         $this->assertFalse($cohort->can_view_members());
         $this->assertFalse($cohort->can_manage_members());
         $this->assertFalse($cohort->can_manage_exceptions());
@@ -132,7 +143,12 @@ final class access_test extends \advanced_testcase {
         $this->assertTrue(management::can_view_index($catcontext));
         $this->assertTrue(management::can_view_index(\core\context\system::instance()));
 
+        access::set($cohort, $user->id, ['usecohort'], false);
+        $this->assertTrue($cohort->can_use());
+        $this->assertFalse($cohort->can_view_members());
+
         access::set($cohort, $user->id, ['viewmembers'], false);
+        $this->assertFalse($cohort->can_use());
         $this->assertTrue($cohort->can_view_members());
         $this->assertFalse($cohort->can_manage_members());
 
@@ -152,6 +168,7 @@ final class access_test extends \advanced_testcase {
 
         $this->setUser($other);
         $this->assertFalse($cohort->can_view());
+        $this->assertFalse($cohort->can_use());
 
         // Oversight capabilities.
         $roleid = $this->getDataGenerator()->create_role();
@@ -164,5 +181,9 @@ final class access_test extends \advanced_testcase {
         $this->assertTrue($cohort->can_manage_members());
         $this->assertTrue($cohort->can_manage_exceptions());
         $this->assertTrue($cohort->can_manage_access());
+        $this->assertFalse($cohort->can_use());
+
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $roleid, $catcontext);
+        $this->assertTrue($cohort->can_use());
     }
 }

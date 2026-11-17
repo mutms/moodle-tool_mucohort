@@ -50,6 +50,7 @@ final class provider implements
         $collection->add_database_table('tool_mucohort_access', [
             'userid' => 'privacy:metadata:field:userid',
             'iscurator' => 'privacy:metadata:field:iscurator',
+            'usecohort' => 'privacy:metadata:field:usecohort',
             'viewmembers' => 'privacy:metadata:field:viewmembers',
             'managemembers' => 'privacy:metadata:field:managemembers',
             'manageexceptions' => 'privacy:metadata:field:manageexceptions',
@@ -210,6 +211,7 @@ final class provider implements
                 if ($access) {
                     $data['access'] = [
                         'curator' => transform::yesno((bool)$access->iscurator),
+                        'usecohort' => transform::yesno((bool)$access->usecohort),
                         'viewmembers' => transform::yesno((bool)$access->viewmembers),
                         'managemembers' => transform::yesno((bool)$access->managemembers),
                         'manageexceptions' => transform::yesno((bool)$access->manageexceptions),

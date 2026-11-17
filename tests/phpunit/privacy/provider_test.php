@@ -92,6 +92,8 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertTrue($writer->has_any_data());
         $data = $writer->get_data([get_string('privacy:cohort', 'tool_mucohort', $cohort1->get_id())]);
         $this->assertSame('Yes', $data->access['curator']);
+        $this->assertSame('No', $data->access['usecohort']);
+        $this->assertSame('Yes', $data->access['viewmembers']);
         $data = $writer->get_data([get_string('privacy:cohort', 'tool_mucohort', $cohort2->get_id())]);
         $this->assertSame('Pilot', $data->exception['reason']);
         $data = $writer->get_data([get_string('privacy:cohort', 'tool_mucohort', $cohort1->get_id())]);
