@@ -107,4 +107,79 @@ final class cohort_lookup_test extends \advanced_testcase {
         $this->assertSame('1=2', cohort_util::get_access_record_sql('c', (int)guest_user()->id)->sql);
         $this->assertSame('1=2', cohort_util::get_access_record_sql('c', 0)->sql);
     }
+
+    public function test_view_members(): void {
+        global $DB;
+
+        $syscontext = \core\context\system::instance();
+        $category = $this->getDataGenerator()->create_category();
+        $catcontext = \core\context\coursecat::instance($category->id);
+        $this->setAdminUser();
+        $cohorts = [];
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Standard']);
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Standard in category', 'contextid' => $catcontext->id]);
+        $cohorts[] = $this->getDataGenerator()->create_cohort(['name' => 'Plugin', 'component' => 'enrol_database']);
+        $curated1 = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Curated 1']);
+        $curated2 = curated::create((object)['contextid' => $catcontext->id, 'name' => 'Curated 2']);
+        $curated3 = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Curated 3']);
+        $rules = \tool_mucohort\local\type\rules::create((object)['contextid' => $syscontext->id, 'name' => 'Rules']);
+        $broken = curated::create((object)['contextid' => $syscontext->id, 'name' => 'Broken']);
+        $DB->delete_records('tool_mucohort', ['cohortid' => $broken->get_id()]);
+        foreach ([$curated1, $curated2, $curated3, $rules, $broken] as $cohort) {
+            $cohorts[] = $DB->get_record('cohort', ['id' => $cohort->get_id()], '*', MUST_EXIST);
+        }
+
+        $generator = $this->getDataGenerator();
+        $users = ['nobody' => $generator->create_user(), 'admin' => get_admin()];
+        $roles = [
+            'view' => ['moodle/cohort:view', $syscontext],
+            'assign' => ['moodle/cohort:assign', $syscontext],
+            'assigncat' => ['moodle/cohort:assign', $catcontext],
+            'viewmembers' => ['tool/mucohort:viewmembers', $syscontext],
+            'viewmemberscat' => ['tool/mucohort:viewmembers', $catcontext],
+        ];
+        foreach ($roles as $name => [$capability, $context]) {
+            $users[$name] = $generator->create_user();
+            $roleid = $generator->create_role();
+            assign_capability($capability, CAP_ALLOW, $roleid, $context);
+            role_assign($roleid, $users[$name]->id, $context);
+        }
+        $users['use'] = $generator->create_user();
+        access::set($curated1, $users['use']->id, [], false);
+        access::set($rules, $users['use']->id, [], false);
+        $users['flag'] = $generator->create_user();
+        access::set($curated1, $users['flag']->id, ['viewmembers'], false);
+        access::set($curated2, $users['flag']->id, ['viewmembers', 'managemembers'], false);
+        access::set($curated3, $users['flag']->id, [], false);
+        access::set($rules, $users['flag']->id, ['viewmembers'], false);
+        access::set($broken, $users['flag']->id, ['viewmembers'], false);
+
+        $names = function (\stdClass $user) use ($DB): array {
+            $sql = (new \tool_mulib\local\sql("SELECT ch.name FROM {cohort} ch WHERE /* viewmembers */ ORDER BY ch.id"))
+                ->replace_comment('viewmembers', cohort_util::get_view_members_sql('ch', (int)$user->id));
+            return $DB->get_fieldset_sql($sql->sql, $sql->params);
+        };
+
+        $all = array_column($cohorts, 'name');
+        $this->assertSame([], $names($users['nobody']));
+        $this->assertSame([], $names($users['view']));
+        $this->assertSame([], $names($users['use']));
+        $this->assertSame($all, $names($users['admin']));
+        $this->assertSame($all, $names($users['viewmembers']));
+        $this->assertSame(['Standard in category', 'Curated 2'], $names($users['viewmemberscat']));
+        $this->assertSame(['Standard', 'Standard in category', 'Plugin', 'Broken'], $names($users['assign']));
+        $this->assertSame(['Standard in category'], $names($users['assigncat']));
+        $this->assertSame(['Curated 1', 'Curated 2', 'Rules'], $names($users['flag']));
+
+        // The SQL and can_view_members() of the cohort types are the same rule.
+        foreach ($users as $user) {
+            $this->setUser($user);
+            $expected = $names($user);
+            foreach ($cohorts as $cohort) {
+                $allowed = in_array($cohort->name, $expected, true);
+                $this->assertSame($allowed, \tool_mucohort\local\type\base::from_record($cohort)->can_view_members(), $cohort->name);
+                $this->assertSame($allowed, cohort_util::can_view_members($cohort), $cohort->name);
+            }
+        }
+    }
 }

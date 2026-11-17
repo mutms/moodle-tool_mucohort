@@ -269,7 +269,7 @@ final class curated_test extends \advanced_testcase {
         $standard = $this->getDataGenerator()->create_cohort();
         $source = new \tool_mucohort\muform\userpicker\standard_member_add_userids((int)$standard->id);
         $this->assertSame([], $source->validate([(string)$user->id]));
-        $this->assertContains((int)$user->id, array_column($source->search('', [], 0)['rows'], 'id'));
+        $this->assertContains((int)$user->id, array_column($source->search('', [], 0, [])['rows'], 'id'));
 
         $cohort->add_members([$user->id]);
         $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $cohort->get_id(), 'userid' => $user->id]));

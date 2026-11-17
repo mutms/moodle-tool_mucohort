@@ -37,6 +37,21 @@ in standard Moodle cohorts, without replacing them and without any core modifica
 * Built for large sites — cohorts with hundreds of thousands of members and sites with thousands of cohorts
 * The only cohort plugin natively compatible with MuTMS multi-tenancy — users of other tenants are never added
 
+## Who may view cohort members
+
+| Cohort | May list members |
+|---|---|
+| Standard cohorts and cohorts of other plugins | `moodle/cohort:assign` or `tool/mucohort:viewmembers` capability in the cohort context |
+| Advanced cohorts (curated, rule-based) | `tool/mucohort:viewmembers` capability in the cohort context, or an access record with "View members" |
+
+Cohort visibility, `moodle/cohort:view` and access records without "View members" allow finding and using
+a cohort, not listing its members. Managing members or exceptions in an access record always includes "View members".
+Without this plugin only `moodle/cohort:assign` allows listing of members, the same as in standard cohort pages.
+
+For developers: the rule is `can_view_members()` of the cohort type classes. Other MuTMS plugins use
+`tool_mulib\local\cohort_util::can_view_members()` and the SQL condition `cohort_util::get_view_members_sql()`,
+for example in the "Cohort" filter of user pickers; the three must be kept in sync.
+
 ## Requirements
 
 > This plugin will be included in the [MuTMS distribution](https://github.com/mutms/mutms) —
