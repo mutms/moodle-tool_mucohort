@@ -67,9 +67,9 @@ Options:
 -h, --help               Print out this help
 
 Examples:
-\$ php admin/tool/mucohort/cli/profilefield_cache.php --list
-\$ php admin/tool/mucohort/cli/profilefield_cache.php --sync
-\$ php admin/tool/mucohort/cli/profilefield_cache.php --sync --field=department
+\$ php public/admin/tool/mucohort/cli/profilefield_cache.php --list
+\$ php public/admin/tool/mucohort/cli/profilefield_cache.php --sync
+\$ php public/admin/tool/mucohort/cli/profilefield_cache.php --sync --field=department
 
 EOT;
     echo $help;

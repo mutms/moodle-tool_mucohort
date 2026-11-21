@@ -86,9 +86,9 @@ Options:
 -h, --help               Print out this help
 
 Examples:
-\$ php admin/tool/mucohort/cli/sync.php --idnumber=staff --dry-run
-\$ php admin/tool/mucohort/cli/sync.php --idnumber=staff --dry-run --csv --export=result > staff.csv
-\$ php admin/tool/mucohort/cli/sync.php --cohortid=12 --force
+\$ php public/admin/tool/mucohort/cli/sync.php --idnumber=staff --dry-run
+\$ php public/admin/tool/mucohort/cli/sync.php --idnumber=staff --dry-run --csv --export=result > staff.csv
+\$ php public/admin/tool/mucohort/cli/sync.php --cohortid=12 --force
 
 EOT;
     echo $help;
