@@ -77,13 +77,17 @@ final class cohort_usage {
     }
 
     /**
-     * Returns usage sections sorted by name.
+     * Returns usage sections and their items sorted by name.
      *
      * @return array section name => list of items with name, url, details and visible properties
      */
     public function get_sections(): array {
         $sections = $this->sections;
         \core_collator::ksort($sections);
+        foreach ($sections as $section => $items) {
+            \core_collator::asort_objects_by_property($items, 'name');
+            $sections[$section] = array_values($items);
+        }
         return $sections;
     }
 }
