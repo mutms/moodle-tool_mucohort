@@ -51,8 +51,4 @@ $observers = [
         'eventname' => \core\event\user_created::class,
         'callback' => \tool_mucohort\local\event_observer::class . '::user_created',
     ],
-    [
-        'eventname' => \core\event\user_info_field_deleted::class,
-        'callback' => \tool_mucohort\local\event_observer::class . '::user_info_field_deleted',
-    ],
 ];

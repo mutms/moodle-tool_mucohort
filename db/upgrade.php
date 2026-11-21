@@ -52,5 +52,22 @@ function xmldb_tool_mucohort_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026111653, 'tool', 'mucohort');
     }
 
+    if ($oldversion < 2026112053) {
+        $table = new xmldb_table('tool_mucohort_profilefield');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        unset_config('profilefields', 'tool_mucohort');
+        unset_config('profilefieldlifetime', 'tool_mucohort');
+
+        $select = 'rulesjson IS NOT NULL OR pendingrulesjson IS NOT NULL';
+        $mucohortids = $DB->get_fieldset_select('tool_mucohort_rules', 'mucohortid', $select);
+        foreach ($mucohortids as $mucohortid) {
+            \tool_mucohort\local\profilefield_util::update_references((int)$mucohortid);
+        }
+
+        upgrade_plugin_savepoint(true, 2026112053, 'tool', 'mucohort');
+    }
+
     return true;
 }

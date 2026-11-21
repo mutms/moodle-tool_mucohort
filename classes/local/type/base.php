@@ -521,6 +521,7 @@ abstract class base {
         $DB->delete_records('tool_mucohort_extdb', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_sync', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_rules', ['mucohortid' => $mucohortid]);
+        \tool_mucohort\local\profilefield_util::update_references($mucohortid);
         $DB->delete_records('tool_mucohort_curated', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_access', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_exception', ['mucohortid' => $mucohortid]);

@@ -110,6 +110,7 @@ final class rules extends advanced {
         $DB->delete_records('tool_mucohort_extdb', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_sync', ['mucohortid' => $mucohortid]);
         $DB->delete_records('tool_mucohort_rules', ['mucohortid' => $mucohortid]);
+        \tool_mucohort\local\profilefield_util::update_references($mucohortid);
     }
 
     #[\Override]
@@ -381,6 +382,7 @@ final class rules extends advanced {
         }
         $DB->set_field('tool_mucohort_rules', 'pendingrulesjson', $ruleset?->to_json(), ['id' => $record->id]);
         $this->rules = null;
+        \tool_mucohort\local\profilefield_util::update_references((int)$this->mucohort->id);
         if ($ruleset === null) {
             \tool_mucohort\event\rules_draft_discarded::create_from_cohort($this)->trigger();
         } else {
@@ -432,6 +434,7 @@ final class rules extends advanced {
         ];
         $DB->update_record('tool_mucohort_rules', $update);
         $this->rules = null;
+        \tool_mucohort\local\profilefield_util::update_references((int)$this->mucohort->id);
         \tool_mucohort\event\rules_approved::create_from_cohort($this)->trigger();
         $this->update_schedule();
     }

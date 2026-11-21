@@ -44,7 +44,6 @@ final class event_observer {
 
         $DB->delete_records('tool_mucohort_access', ['userid' => $userid]);
         $DB->delete_records('tool_mucohort_exception', ['userid' => $userid]);
-        $DB->delete_records('tool_mucohort_profilefield', ['userid' => $userid]);
         $DB->set_field('tool_mucohort_extdb_user', 'userid', null, ['userid' => $userid]);
 
         $DB->set_field('tool_mucohort_access', 'usermodified', null, ['usermodified' => $userid]);
@@ -105,15 +104,6 @@ final class event_observer {
             return;
         }
         sync::sync_user_instantly((int)$event->objectid, ['synconusercreated']);
-    }
-
-    /**
-     * Profile field deleted - remove cached values, rules using the field become broken.
-     *
-     * @param \core\event\user_info_field_deleted $event
-     */
-    public static function user_info_field_deleted(\core\event\user_info_field_deleted $event): void {
-        profilefield_cache::remove_field((int)$event->objectid);
     }
 
     /**

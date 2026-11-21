@@ -63,6 +63,7 @@ Feature: Preview of draft rules and running of queued syncs
     And the following "users" exist:
       | username | firstname | lastname | email             | profile_field_level |
       | user3    | User      | 3        | user3@example.com | Senior              |
+    And all custom profile fields are cached
     And I press "Add exclude rule"
     And I set the following muform fields:
       | Rule type | tool_mucohort:profilefield |

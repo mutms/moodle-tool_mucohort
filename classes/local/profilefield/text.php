@@ -36,12 +36,6 @@ use tool_mulib\muform\form;
  */
 class text extends base {
     #[\Override]
-    public function get_cache_sql(string $data): array {
-        global $DB;
-        return [$DB->sql_substr("TRIM($data)", 1, 255), null];
-    }
-
-    #[\Override]
     public function get_operators(): array {
         $result = [];
         foreach (['equals', 'startswith', 'endswith', 'contains', 'empty'] as $operator) {

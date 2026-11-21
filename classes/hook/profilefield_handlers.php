@@ -25,7 +25,8 @@ use tool_mucohort\local\profilefield\base;
  *
  * Handlers for core profile field types are registered before dispatching,
  * plugins may add handlers for their own profile field types or remove the built-in ones.
- * Fields of types without handler cannot be used in cohort rules.
+ * Fields of types without handler cannot be used in cohort rules, values of the type
+ * must be also cached by tool_mulib, see \tool_mulib\hook\profilefield_handlers.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda

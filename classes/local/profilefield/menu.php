@@ -51,12 +51,6 @@ class menu extends base {
     }
 
     #[\Override]
-    public function get_cache_sql(string $data): array {
-        global $DB;
-        return [$DB->sql_substr("TRIM($data)", 1, 255), null];
-    }
-
-    #[\Override]
     public function get_operators(): array {
         return ['equals' => get_string('rule_userfield_op_equals', 'tool_mucohort')];
     }

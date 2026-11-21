@@ -64,14 +64,6 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configduration(
-        'tool_mucohort/profilefieldlifetime',
-        new lang_string('setting_profilefieldlifetime', 'tool_mucohort'),
-        new lang_string('setting_profilefieldlifetime_desc', 'tool_mucohort'),
-        HOURSECS,
-        MINSECS
-    ));
-
-    $settings->add(new admin_setting_configduration(
         'tool_mucohort/syncretention',
         new lang_string('setting_syncretention', 'tool_mucohort'),
         new lang_string('setting_syncretention_desc', 'tool_mucohort'),

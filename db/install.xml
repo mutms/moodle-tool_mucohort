@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="admin/tool/mucohort/db" VERSION="20261024" COMMENT="XMLDB file for tool_mucohort plugin"
+<XMLDB PATH="admin/tool/mucohort/db" VERSION="20261121" COMMENT="XMLDB file for tool_mucohort plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -143,25 +143,6 @@
         <INDEX NAME="timequeued" UNIQUE="false" FIELDS="timequeued" COMMENT="Site report time filters and retention purge"/>
         <INDEX NAME="duration" UNIQUE="false" FIELDS="duration" COMMENT="Site report filtering and sorting of slow syncs"/>
         <INDEX NAME="status" UNIQUE="false" FIELDS="status" COMMENT="Finding the few queued and running syncs on the site"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="tool_mucohort_profilefield" COMMENT="Cache of custom profile field values of supported types for fast rule evaluation, ignores field visibility">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="charvalue" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Value of text-like fields, truncated to 255 characters"/>
-        <FIELD NAME="intvalue" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Value of checkbox and datetime fields"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="user_info_field" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="userid-fieldid" UNIQUE="true" FIELDS="userid, fieldid"/>
-        <INDEX NAME="fieldid-charvalue" UNIQUE="false" FIELDS="fieldid, charvalue"/>
-        <INDEX NAME="fieldid-intvalue" UNIQUE="false" FIELDS="fieldid, intvalue"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="tool_mucohort_extdb" COMMENT="External database sources of rule-based cohorts, each query may be used only once per cohort">

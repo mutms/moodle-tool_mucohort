@@ -20,7 +20,7 @@
 
 namespace tool_mucohort\phpunit\local\rule;
 
-use tool_mucohort\local\profilefield_cache;
+use tool_mulib\local\profilefield_cache;
 use tool_mucohort\local\rule\base;
 use tool_mucohort\local\ruleset;
 use tool_mucohort\local\sync;
@@ -39,6 +39,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(\tool_mucohort\local\rule\include_profile_field::class)]
 #[CoversClass(\tool_mucohort\local\rule\exclude_profile_field::class)]
 #[CoversClass(\tool_mucohort\local\rule_not_ready_exception::class)]
+#[CoversClass(\tool_mucohort\local\profilefield_util::class)]
 #[Group('MuTMS')]
 final class profile_field_test extends \advanced_testcase {
     /** @var rules */
@@ -66,8 +67,9 @@ final class profile_field_test extends \advanced_testcase {
      */
     private function cache_fields(): void {
         foreach ($this->fields as $field) {
-            profilefield_cache::populate_field((int)$field->id, new \null_progress_trace());
+            profilefield_cache::add_field((int)$field->id);
         }
+        profilefield_cache::populate_pending_fields(new \null_progress_trace());
     }
 
     /**
@@ -161,15 +163,23 @@ final class profile_field_test extends \advanced_testcase {
         $this->cohort->approve_draft(sha1($this->cohort->get_rules_record()->pendingrulesjson));
         $this->assertSame(rules::STATE_ACTIVE, $this->cohort->get_state());
 
-        // Preview caches values.
-        $this->cohort->before_preview($ruleset);
-        $this->assertTrue(profilefield_cache::is_ready((int)$this->fields['dept']->id));
-        profilefield_cache::remove_field((int)$this->fields['dept']->id);
+        // Approved rules reference the field, the field is added to cache but values are not ready yet.
+        $references = profilefield_cache::get_references((int)$this->fields['dept']->id);
+        $this->assertCount(1, $references);
+        $reference = reset($references);
+        $expected = ['tool_mucohort', 'rules', (int)$this->cohort->get_mucohort()->id];
+        $this->assertSame($expected, [$reference->component, $reference->area, (int)$reference->itemid]);
+        $this->assertFalse(profilefield_cache::is_ready((int)$this->fields['dept']->id));
 
-        // Values are cached before full sync.
+        // Full sync waits for values, nothing is changed meanwhile.
+        $result = sync::run($this->cohort, new \null_progress_trace());
+        $this->assertSame(sync::STATUS_BROKEN, (int)$result->status);
+        $this->assertSame(rules::STATE_ACTIVE, $this->cohort->get_state());
+        $this->assertFalse($DB->record_exists('cohort_members', ['cohortid' => $this->cohort->get_id(), 'userid' => $user->id]));
+
+        profilefield_cache::populate_pending_fields(new \null_progress_trace());
         $result = sync::run($this->cohort, new \null_progress_trace());
         $this->assertSame(sync::STATUS_OK, (int)$result->status);
-        $this->assertTrue(profilefield_cache::is_ready((int)$this->fields['dept']->id));
         $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $this->cohort->get_id(), 'userid' => $user->id]));
 
         // Single user sync uses current value.
@@ -179,7 +189,30 @@ final class profile_field_test extends \advanced_testcase {
         $this->assertNotNull($rule);
     }
 
+    public function test_references(): void {
+        $deptid = (int)$this->fields['dept']->id;
+        $levelid = (int)$this->fields['level']->id;
+        $ruleset = new ruleset();
+        $ruleset->add_rule(base::KIND_INCLUDE, 'tool_mucohort:profilefield', ['fieldid' => $deptid, 'operator' => 'empty', 'values' => []]);
+        $this->cohort->set_pending_ruleset($ruleset);
+        $this->assertCount(1, profilefield_cache::get_references($deptid));
+        $this->cohort->approve_draft(sha1($this->cohort->get_rules_record()->pendingrulesjson));
+        $this->assertCount(1, profilefield_cache::get_references($deptid));
+
+        $draft = $this->cohort->start_draft();
+        $draft->add_rule(base::KIND_EXCLUDE, 'tool_mucohort:profilefield', ['fieldid' => $levelid, 'operator' => 'equals', 'values' => ['Lead']]);
+        $this->cohort->set_pending_ruleset($draft);
+        $this->assertCount(1, profilefield_cache::get_references($levelid));
+        $this->cohort->set_pending_ruleset(null);
+        $this->assertCount(0, profilefield_cache::get_references($levelid));
+        $this->assertCount(1, profilefield_cache::get_references($deptid));
+
+        $this->cohort->delete();
+        $this->assertCount(0, profilefield_cache::get_references($deptid));
+    }
+
     public function test_form_data(): void {
+        $this->cache_fields();
         $ruleset = new ruleset();
         $uuid = $ruleset->add_rule(base::KIND_INCLUDE, 'tool_mucohort:profilefield', []);
         $rule = $this->cohort->get_rule_instance($ruleset->get_rule($uuid));

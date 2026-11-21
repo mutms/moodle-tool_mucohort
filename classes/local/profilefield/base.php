@@ -26,9 +26,9 @@ use tool_mulib\muform\form;
 /**
  * Base for handlers of custom profile field types used in cohort rules.
  *
- * Handlers provide SQL expressions mapping stored profile field data to cached values in tool_mucohort_profilefield
- * and provide conditions on the cache. Every non-deleted user has one cached row per cached
- * field with the effective value, that is the stored data or the field default.
+ * Handlers provide conditions on cached values in tool_mulib_profilefield, see tool_mulib profilefield_cache.
+ * Every non-deleted user has one cached row per cached field with the effective value,
+ * that is the stored data or the field default.
  *
  * Rule configuration: operator and values, values are interpreted by the handler.
  *
@@ -65,15 +65,6 @@ abstract class base {
     final public function get_field_name(): string {
         return format_string($this->field->name, true, ['context' => \core\context\system::instance()]);
     }
-
-    /**
-     * Returns SQL expressions of cached values.
-     *
-     * @param string $data expression of stored data without parameters,
-     *      the field default is already used when user has no data
-     * @return array [charvalue, intvalue] SQL expressions, null for column that is not used
-     */
-    abstract public function get_cache_sql(string $data): array;
 
     /**
      * Returns supported operators.

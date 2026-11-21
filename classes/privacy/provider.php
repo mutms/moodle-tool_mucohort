@@ -81,12 +81,6 @@ final class provider implements
             'usercreated' => 'privacy:metadata:field:usercreated',
         ], 'privacy:metadata:table:tool_mucohort_extdb');
 
-        $collection->add_database_table('tool_mucohort_profilefield', [
-            'userid' => 'privacy:metadata:field:userid',
-            'charvalue' => 'privacy:metadata:field:charvalue',
-            'intvalue' => 'privacy:metadata:field:intvalue',
-        ], 'privacy:metadata:table:tool_mucohort_profilefield');
-
         $collection->add_subsystem_link('core_cohort', [], 'privacy:metadata:core_cohort');
         $collection->add_subsystem_link('core_role', [], 'privacy:metadata:core_role');
 
@@ -125,12 +119,6 @@ final class provider implements
         }
         $contextlist->add_from_sql(self::get_cohort_contexts_sql(), $params);
 
-        $sql = "SELECT ctx.id
-                  FROM {context} ctx
-                  JOIN {tool_mucohort_profilefield} pf ON pf.userid = ctx.instanceid AND ctx.contextlevel = :userlevel
-                 WHERE pf.userid = :userid";
-        $contextlist->add_from_sql($sql, ['userlevel' => CONTEXT_USER, 'userid' => $userid]);
-
         return $contextlist;
     }
 
@@ -138,11 +126,6 @@ final class provider implements
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
 
-        if ($context->contextlevel == CONTEXT_USER) {
-            $sql = "SELECT userid FROM {tool_mucohort_profilefield} WHERE userid = :userid";
-            $userlist->add_from_sql('userid', $sql, ['userid' => $context->instanceid]);
-            return;
-        }
         if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT) {
             return;
         }
@@ -181,22 +164,6 @@ final class provider implements
         $types = exception::get_types();
 
         foreach ($contextlist->get_contexts() as $context) {
-            if ($context->contextlevel == CONTEXT_USER) {
-                $values = $DB->get_records('tool_mucohort_profilefield', ['userid' => $userid], 'fieldid ASC');
-                if ($values) {
-                    $data = array_map(fn($v) => [
-                        'fieldid' => $v->fieldid,
-                        'charvalue' => $v->charvalue,
-                        'intvalue' => $v->intvalue,
-                    ], array_values($values));
-                    writer::with_context($context)->export_data(
-                        [get_string('privacy:profilefields', 'tool_mucohort')],
-                        (object)['profilefields' => $data]
-                    );
-                }
-                continue;
-            }
-
             $cohorts = $DB->get_records_sql(
                 "SELECT c.id, c.name, mc.id AS mucohortid
                    FROM {cohort} c
@@ -309,43 +276,20 @@ final class provider implements
 
     #[\Override]
     public static function delete_data_for_all_users_in_context(\context $context) {
-        global $DB;
-
-        if ($context->contextlevel == CONTEXT_USER) {
-            $DB->delete_records('tool_mucohort_profilefield', ['userid' => $context->instanceid]);
-            return;
-        }
         self::delete_cohort_data($context, null);
     }
 
     #[\Override]
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
-
         $userid = (int)$contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
-            if ($context->contextlevel == CONTEXT_USER) {
-                if ($context->instanceid == $userid) {
-                    $DB->delete_records('tool_mucohort_profilefield', ['userid' => $userid]);
-                }
-                continue;
-            }
             self::delete_cohort_data($context, [$userid]);
         }
     }
 
     #[\Override]
     public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
-
         $context = $userlist->get_context();
-        $userids = $userlist->get_userids();
-        if ($context->contextlevel == CONTEXT_USER) {
-            if (in_array($context->instanceid, $userids)) {
-                $DB->delete_records('tool_mucohort_profilefield', ['userid' => $context->instanceid]);
-            }
-            return;
-        }
-        self::delete_cohort_data($context, $userids);
+        self::delete_cohort_data($context, $userlist->get_userids());
     }
 }

@@ -35,12 +35,6 @@ use tool_mulib\muform\form;
  */
 class checkbox extends base {
     #[\Override]
-    public function get_cache_sql(string $data): array {
-        // Empty data and '0' mean not checked.
-        return [null, "CASE WHEN TRIM($data) IN ('', '0') THEN 0 ELSE 1 END"];
-    }
-
-    #[\Override]
     public function get_operators(): array {
         return [
             'checked' => get_string('rule_profilefield_op_checked', 'tool_mucohort'),

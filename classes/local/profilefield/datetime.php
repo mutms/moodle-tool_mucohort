@@ -36,14 +36,6 @@ use tool_mulib\muform\form;
  */
 class datetime extends base {
     #[\Override]
-    public function get_cache_sql(string $data): array {
-        global $DB;
-        // Empty data means not set, stored timestamps are always numbers.
-        $timestamp = $DB->sql_cast_char2int("TRIM($data)");
-        return [null, "CASE WHEN TRIM($data) = '' THEN 0 ELSE $timestamp END"];
-    }
-
-    #[\Override]
     public function get_operators(): array {
         $result = [];
         foreach (['before', 'after', 'lastdays'] as $operator) {

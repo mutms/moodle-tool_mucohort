@@ -20,7 +20,8 @@ namespace tool_mucohort\local\rule;
 
 use stdClass;
 use tool_mucohort\local\broken_rules_exception;
-use tool_mucohort\local\profilefield_cache;
+use tool_mucohort\local\profilefield_util;
+use tool_mulib\local\profilefield_cache;
 use tool_mucohort\local\rule_not_ready_exception;
 use tool_mulib\local\sql;
 use tool_mulib\muform\element\select;
@@ -53,7 +54,7 @@ abstract class profile_field extends base {
 
     #[\Override]
     public static function is_available(): bool {
-        return (bool)profilefield_cache::get_supported_fields();
+        return (bool)profilefield_util::get_supported_fields();
     }
 
     /**
@@ -74,7 +75,7 @@ abstract class profile_field extends base {
         if (!$field) {
             throw new broken_rules_exception('error_rule_profilefieldmissing', $fieldid);
         }
-        $handler = profilefield_cache::get_handler($field);
+        $handler = profilefield_util::get_handler($field);
         if (!$handler) {
             throw new broken_rules_exception('error_rule_profilefieldunsupported', $field->datatype);
         }
@@ -101,7 +102,7 @@ abstract class profile_field extends base {
         }
         $sql = new sql(
             "EXISTS (SELECT 'x'
-                       FROM {tool_mucohort_profilefield} pf
+                       FROM {tool_mulib_profilefield} pf
                       WHERE pf.userid = u.id AND pf.fieldid = ? /* condition */)",
             [$config['fieldid']]
         );
@@ -109,21 +110,10 @@ abstract class profile_field extends base {
     }
 
     #[\Override]
-    public function before_preview(array $config, \progress_trace $trace): void {
-        self::get_handler($config);
-        if (profilefield_cache::is_outdated($config['fieldid'])) {
-            profilefield_cache::populate_field($config['fieldid'], $trace);
-        }
-    }
-
-    #[\Override]
     public function before_sync(array $config, ?int $userid, \progress_trace $trace): void {
         self::get_handler($config);
         if ($userid) {
-            // Make sure instant sync uses the current value.
             profilefield_cache::update_user($userid, $config['fieldid']);
-        } else if (profilefield_cache::is_outdated($config['fieldid'])) {
-            profilefield_cache::populate_field($config['fieldid'], $trace);
         }
     }
 
@@ -144,7 +134,7 @@ abstract class profile_field extends base {
 
     #[\Override]
     public function add_form_elements(form $form): void {
-        $handlers = profilefield_cache::get_supported_fields();
+        $handlers = profilefield_util::get_supported_fields(true);
 
         $options = ['' => ''];
         foreach ($handlers as $fieldid => $handler) {
@@ -178,7 +168,7 @@ abstract class profile_field extends base {
 
     #[\Override]
     public function validate_form_data(array $data, array &$allerrors): void {
-        $handler = profilefield_cache::get_supported_fields()[(int)($data['fieldid'] ?? 0)] ?? null;
+        $handler = profilefield_util::get_supported_fields(true)[(int)($data['fieldid'] ?? 0)] ?? null;
         if (!$handler) {
             $allerrors['fieldid'][] = get_string('required');
             return;
@@ -189,7 +179,7 @@ abstract class profile_field extends base {
     #[\Override]
     public function get_config(stdClass $data): array {
         $fieldid = (int)$data->fieldid;
-        $handler = profilefield_cache::get_supported_fields()[$fieldid];
+        $handler = profilefield_util::get_supported_fields(true)[$fieldid];
         [$operator, $values] = $handler->get_config(self::get_prefix($fieldid), $data);
         return ['fieldid' => $fieldid, 'operator' => $operator, 'values' => $values];
     }

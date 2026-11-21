@@ -49,7 +49,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
     public function test_get_metadata(): void {
         $collection = new \core_privacy\local\metadata\collection('tool_mucohort');
         $collection = provider::get_metadata($collection);
-        $this->assertCount(8, $collection->get_collection());
+        $this->assertCount(7, $collection->get_collection());
     }
 
     public function test_export_and_delete(): void {
@@ -127,29 +127,5 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         provider::delete_data_for_all_users_in_context($catcontext);
         $this->assertFalse($DB->record_exists('tool_mucohort_access', []));
         $this->assertSame(1, $DB->count_records('tool_mucohort_exception'));
-    }
-
-    public function test_profilefield_cache(): void {
-        global $DB;
-
-        $field = $this->getDataGenerator()->create_custom_profile_field(['datatype' => 'text', 'shortname' => 'dept', 'name' => 'Dept']);
-        $user1 = $this->getDataGenerator()->create_user(['profile_field_dept' => 'Sales']);
-        $user2 = $this->getDataGenerator()->create_user(['profile_field_dept' => 'HR']);
-        \tool_mucohort\local\profilefield_cache::populate_field((int)$field->id, new \null_progress_trace());
-        $usercontext = \core\context\user::instance($user1->id);
-
-        $contextlist = provider::get_contexts_for_userid($user1->id);
-        $this->assertSame([$usercontext->id], array_map('intval', $contextlist->get_contextids()));
-        $userlist = new userlist($usercontext, 'tool_mucohort');
-        provider::get_users_in_context($userlist);
-        $this->assertSame([(int)$user1->id], array_map('intval', $userlist->get_userids()));
-
-        provider::export_user_data(new approved_contextlist($user1, 'tool_mucohort', [$usercontext->id]));
-        $data = writer::with_context($usercontext)->get_data([get_string('privacy:profilefields', 'tool_mucohort')]);
-        $this->assertSame('Sales', $data->profilefields[0]['charvalue']);
-
-        provider::delete_data_for_user(new approved_contextlist($user1, 'tool_mucohort', [$usercontext->id]));
-        $this->assertFalse($DB->record_exists('tool_mucohort_profilefield', ['userid' => $user1->id]));
-        $this->assertTrue($DB->record_exists('tool_mucohort_profilefield', ['userid' => $user2->id]));
     }
 }

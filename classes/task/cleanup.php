@@ -19,7 +19,7 @@
 namespace tool_mucohort\task;
 
 /**
- * Delete old sync history and cached values of profile fields that are not used in rules any more.
+ * Delete old sync history.
  *
  * @package     tool_mucohort
  * @copyright   2026 Petr Skoda
@@ -35,6 +35,5 @@ final class cleanup extends \core\task\scheduled_task {
     public function execute(): void {
         $trace = new \text_progress_trace();
         \tool_mucohort\local\sync::purge_history($trace);
-        \tool_mucohort\local\profilefield_cache::remove_unused_fields($trace);
     }
 }
